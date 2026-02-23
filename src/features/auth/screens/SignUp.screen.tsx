@@ -12,7 +12,8 @@ import SignUpForm from "../components/signup/SignUpForm";
 
 export default function SignUpPage() {
   return (
-    <div className="grid grid-cols-1 lg:grid-cols-[55%_45%] h-screen overflow-hidden">
+    <div className="grid grid-cols-1 lg:grid-cols-[55%_45%] h-screen overflow-hidden"
+    style={{ background:"linear-gradient(160deg,#faf9f6 0%,#f3f0e8 55%,#eef5ee 100%)" }}>
       {/*
         Left: Hero panel — 55% width on large screens.
         Slightly wider than 50/50 so the headline has room to breathe.

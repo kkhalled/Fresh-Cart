@@ -5,23 +5,25 @@ import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faLeaf, faTruck, faShieldHalved } from "@fortawesome/free-solid-svg-icons";
 
 const features = [
-  { icon: faLeaf,         gradient: "from-emerald-400 to-green-500",  text: "100% Fresh & Organic",  sub: "Certified organic farms only"       },
-  { icon: faTruck,        gradient: "from-teal-400 to-cyan-500",       text: "Same-Day Delivery",      sub: "Lightning-fast to your door"        },
-  { icon: faShieldHalved, gradient: "from-green-400 to-emerald-500",   text: "Secure & Protected",     sub: "Enterprise-grade encryption"        },
+  { icon: faLeaf,         gradient: "from-emerald-500 to-green-600",  shadow: "shadow-emerald-500/20", text: "100% Fresh & Organic",  sub: "Certified organic farms only"  },
+  { icon: faTruck,        gradient: "from-teal-500 to-cyan-600",       shadow: "shadow-teal-500/20",    text: "Same-Day Delivery",      sub: "Lightning-fast to your door"   },
+  { icon: faShieldHalved, gradient: "from-green-500 to-emerald-600",   shadow: "shadow-green-500/20",   text: "Secure & Protected",     sub: "Enterprise-grade encryption"   },
 ];
 
 export default function SignupHero() {
   return (
-    <div className="relative w-full h-full overflow-hidden flex flex-col ">
+    <div className="relative w-full h-full overflow-hidden flex flex-col"
+      >
 
       <style>{`
-        @import url('https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,800;1,700&display=swap');
+        @import url('https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,800;1,700&family=DM+Sans:wght@300;400;500;600&display=swap');
 
-        @keyframes fc-float        { 0%,100%{transform:translateY(0) rotate(0deg)}  40%{transform:translateY(-16px) rotate(1deg)}  70%{transform:translateY(-6px) rotate(-1deg)} }
-        @keyframes fc-float-r      { 0%,100%{transform:translateY(0) rotate(0deg)}  40%{transform:translateY(12px) rotate(-1deg)}  70%{transform:translateY(5px) rotate(1deg)} }
-        @keyframes fc-pulse        { 0%,100%{opacity:.12;transform:scale(1)}         50%{opacity:.28;transform:scale(1.12)} }
-        @keyframes fc-slide-up     { from{opacity:0;transform:translateY(22px)}      to{opacity:1;transform:translateY(0)} }
-        @keyframes fc-ping-custom  { 0%{transform:scale(1);opacity:.8} 70%{transform:scale(2);opacity:0} 100%{transform:scale(2);opacity:0} }
+        @keyframes fc-float    { 0%,100%{transform:translateY(0) rotate(0deg)} 40%{transform:translateY(-14px) rotate(.8deg)} 70%{transform:translateY(-5px) rotate(-.8deg)} }
+        @keyframes fc-float-r  { 0%,100%{transform:translateY(0) rotate(0deg)} 40%{transform:translateY(10px) rotate(-.8deg)} 70%{transform:translateY(4px) rotate(.8deg)} }
+        @keyframes fc-pulse    { 0%,100%{opacity:.1;transform:scale(1)} 50%{opacity:.22;transform:scale(1.1)} }
+        @keyframes fc-slide-up { from{opacity:0;transform:translateY(20px)} to{opacity:1;transform:translateY(0)} }
+        @keyframes fc-spin     { from{transform:rotate(0deg)} to{transform:rotate(360deg)} }
+        @keyframes fc-blink    { 0%,100%{opacity:.4} 50%{opacity:1} }
 
         .fc-logo   { animation: fc-slide-up .65s cubic-bezier(.16,1,.3,1) .05s both }
         .fc-badge  { animation: fc-slide-up .65s cubic-bezier(.16,1,.3,1) .12s both }
@@ -34,99 +36,90 @@ export default function SignupHero() {
 
         .fc-feat-icon { transition: transform .3s cubic-bezier(.34,1.56,.64,1) }
         .fc-feat:hover .fc-feat-icon { transform: scale(1.15) rotate(-6deg) }
-        .fc-ping { animation: fc-ping-custom 1.4s cubic-bezier(0,0,.2,1) infinite }
+        .fc-dot { animation: fc-blink 2.5s ease-in-out infinite }
       `}</style>
 
-      {/* ── BG layers ── */}
-      <div className="absolute inset-0 bg-gradient-to-br from-[#052e1c] via-[#064e3b] to-[#065f46]" />
-      <div className="absolute inset-0 bg-[radial-gradient(ellipse_70%_55%_at_115%_-5%,rgba(16,185,129,.22),transparent)]" />
-      <div className="absolute inset-0 bg-[radial-gradient(ellipse_60%_65%_at_-8%_108%,rgba(5,150,105,.25),transparent)]" />
-      {/* Grain */}
-      <div className="absolute inset-0 opacity-[0.04] pointer-events-none"
-        style={{ backgroundImage:`url("data:image/svg+xml,%3Csvg viewBox='0 0 512 512' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.72' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E")`, backgroundSize:"160px" }} />
-      {/* Grid */}
-      <div className="absolute inset-0 opacity-[0.025] pointer-events-none"
-        style={{ backgroundImage:"linear-gradient(rgba(255,255,255,1) 1px,transparent 1px),linear-gradient(90deg,rgba(255,255,255,1) 1px,transparent 1px)", backgroundSize:"52px 52px" }} />
-      {/* Orbs */}
-      <div className="absolute -top-16 -right-12 w-72 h-72 rounded-full pointer-events-none"
-        style={{ background:"radial-gradient(circle,rgba(52,211,153,.18) 0%,transparent 70%)", animation:"fc-pulse 7s ease-in-out infinite" }} />
-      <div className="absolute -bottom-14 -left-16 w-64 h-64 rounded-full pointer-events-none"
-        style={{ background:"radial-gradient(circle,rgba(20,184,166,.13) 0%,transparent 70%)", animation:"fc-pulse 9s ease-in-out infinite 2s" }} />
-      {/* Rings */}
-      <div className="absolute -top-20 -right-20 w-96 h-96 rounded-full border border-white/[0.05] pointer-events-none" style={{ animation:"fc-float 18s ease-in-out infinite" }} />
-      <div className="absolute -top-10 -right-10 w-64 h-64 rounded-full border border-white/[0.04] pointer-events-none" style={{ animation:"fc-float 18s ease-in-out infinite 1.5s" }} />
-      <div className="absolute -bottom-16 -left-16 w-80 h-80 rounded-full border border-white/[0.04] pointer-events-none" style={{ animation:"fc-float-r 15s ease-in-out infinite" }} />
-      {/* Particles */}
-      <div className="absolute top-[20%] left-[14%] w-1.5 h-1.5 rounded-full bg-emerald-300/40 pointer-events-none" style={{ animation:"fc-float 7s ease-in-out infinite" }} />
-      <div className="absolute top-[55%] right-[16%] w-2 h-2 rounded-full bg-white/15 pointer-events-none" style={{ animation:"fc-float-r 9s ease-in-out infinite 1s" }} />
-      <div className="absolute bottom-[22%] left-[44%] w-1 h-1 rounded-full bg-teal-300/30 pointer-events-none" style={{ animation:"fc-float 11s ease-in-out infinite 3s" }} />
+      {/* Dot grid — identical to signin hero */}
+    
+
+  
       {/* Right edge */}
-      <div className="absolute top-0 right-0 w-px h-full bg-gradient-to-b from-transparent via-white/[0.08] to-transparent pointer-events-none" />
+      <div className="absolute top-0 right-0 w-px h-full pointer-events-none"
+        style={{ background:"linear-gradient(to bottom,transparent,rgba(0,0,0,0.05),transparent)" }} />
 
-      {/* ══════════ CONTENT ══════════
-          Key fix: px-8 py-8 with gap-5 between sections — no justify-between
-          that was creating the huge gap. Instead, logo at top, then everything
-          flows naturally down with controlled spacing. ── */}
-      <div className="relative z-10 shadow-2xl flex flex-col h-full px-8 py-8 gap-8">
+      {/* ══ CONTENT ══ */}
+      <div className="relative z-10 flex flex-col h-full px-8 py-8 gap-6">
 
-      
+        {/* Logo */}
+        <div className="fc-logo flex items-center gap-2">
+          <svg width="18" height="18" viewBox="0 0 20 20" fill="none">
+            <path d="M10 2C10 2 4 6 4 12a6 6 0 0012 0C16 6 10 2 10 2Z" fill="#16a34a" opacity=".9"/>
+            <path d="M10 8v7M10 8C10 8 7.5 10.5 7 12" stroke="#fff" strokeWidth="1.2" strokeLinecap="round"/>
+          </svg>
+          <span className="font-black text-gray-900 text-[17px]"
+            style={{ fontFamily:"'Playfair Display',serif", fontStyle:"italic" }}>
+            FreshCart
+          </span>
+        </div>
 
         {/* Badge */}
-        <div className="fc-badge flex items-center gap-2 w-fit px-3.5 py-1.5 rounded-full bg-white/[0.07] backdrop-blur-md border border-white/[0.1] shadow-md">
-          <span className="relative flex h-1.5 w-1.5">
-            <span className="fc-ping absolute inline-flex h-full w-full rounded-full bg-emerald-400 opacity-75" />
-            <span className="relative inline-flex rounded-full h-1.5 w-1.5 bg-emerald-400" />
-          </span>
-          <span className="text-white/75 text-[9.5px] font-semibold tracking-[0.12em] uppercase">
+        <div className="fc-badge flex items-center gap-2 w-fit">
+          <span className="fc-dot w-1.5 h-1.5 rounded-full bg-green-500 inline-block" />
+          <span className="text-[9.5px] font-semibold text-green-700 tracking-[0.13em] uppercase"
+            style={{ fontFamily:"'DM Sans',sans-serif" }}>
             Trusted by 50,000+ customers
           </span>
         </div>
 
         {/* Headline */}
         <div className="fc-head">
-          <h1 className="text-white font-black leading-[1.06] tracking-tight"
-            style={{ fontFamily:"'Playfair Display',serif", fontSize:"clamp(2rem,2.8vw,3rem)" }}>
+          <h1 className="text-gray-900 font-black leading-[1.05] tracking-tight"
+            style={{ fontFamily:"'Playfair Display',serif", fontSize:"clamp(1.9rem,2.6vw,2.8rem)" }}>
             Fresh groceries,
             <br />
-            <em className="not-italic" style={{
+            <em style={{
               fontStyle:"italic",
-              background:"linear-gradient(100deg,#6ee7b7 0%,#a7f3d0 45%,#34d399 100%)",
-              WebkitBackgroundClip:"text", WebkitTextFillColor:"transparent"
+              background:"linear-gradient(100deg,#16a34a,#4ade80)",
+              WebkitBackgroundClip:"text",
+              WebkitTextFillColor:"transparent",
             }}>
               delivered
             </em>{" "}to
             <br />your door.
           </h1>
-          {/* Accent line */}
-          <div className="mt-2 w-14 h-0.5 rounded-full bg-gradient-to-r from-emerald-400 to-transparent opacity-50" />
-          <p className="text-white/40 text-[12px] leading-relaxed mt-3 font-light max-w-[280px]">
+          <svg className="mt-2" width="72" height="7" viewBox="0 0 72 7" fill="none">
+            <path d="M2 5 Q18 2 36 4.5 Q54 7 70 3" stroke="#4ade80" strokeWidth="2" strokeLinecap="round" fill="none" opacity=".75"/>
+          </svg>
+          <p className="text-gray-500 text-[12px] leading-relaxed mt-3 font-light max-w-[280px]"
+            style={{ fontFamily:"'DM Sans',sans-serif" }}>
             Farm‑fresh, organic produce picked at peak ripeness and delivered the same day. Fair prices, always.
           </p>
         </div>
 
-        {/* Feature cards — flex-1 so they fill remaining space naturally */}
+        {/* Feature cards — white on light bg */}
         <div className="flex flex-col gap-2 flex-1">
-          {features.map(({ icon, gradient, text, sub }, i) => (
+          {features.map(({ icon, gradient, shadow, text, sub }, i) => (
             <div key={i}
-              className="fc-feat group flex items-center gap-3 px-3.5 py-2.5 rounded-xl bg-white/[0.05] backdrop-blur-sm border border-white/[0.07] hover:bg-white/[0.09] hover:border-white/[0.13] transition-all duration-300 cursor-default">
-              <div className={`fc-feat-icon shrink-0 w-9 h-9 rounded-xl bg-gradient-to-br ${gradient} flex items-center justify-center shadow-lg shadow-black/20`}>
+              className="fc-feat group flex items-center gap-3 px-3.5 py-2.5 rounded-xl bg-white/70 border border-gray-200/80 hover:bg-white hover:border-green-200 hover:shadow-md transition-all duration-300 cursor-default">
+              <div className={`fc-feat-icon shrink-0 w-9 h-9 rounded-xl bg-gradient-to-br ${gradient} flex items-center justify-center shadow-lg ${shadow}`}>
                 <FontAwesomeIcon icon={icon} className="text-white text-[10px]" />
               </div>
               <div>
-                <p className="text-white/90 text-[12px] font-semibold leading-snug">{text}</p>
-                <p className="text-white/35 text-[10px] leading-snug">{sub}</p>
+                <p className="text-gray-800 text-[12px] font-semibold leading-snug">{text}</p>
+                <p className="text-gray-400 text-[10px] leading-snug">{sub}</p>
               </div>
             </div>
           ))}
         </div>
 
-        {/* Bottom: testimonial + stats — pinned at bottom with mt-auto */}
+        {/* Bottom */}
         <div className="fc-bottom flex flex-col gap-2.5 mt-auto">
-          {/* Mini testimonial */}
-          <div className="flex items-center gap-3 px-3.5 py-2.5 rounded-xl bg-white/[0.04] border border-white/[0.07] backdrop-blur-sm">
+
+          {/* Testimonial */}
+          <div className="flex items-center gap-3 px-3.5 py-2.5 rounded-xl bg-white/60 border border-gray-200/70">
             <div className="flex -space-x-1.5 shrink-0">
               {[["SJ","#059669","#047857"],["MK","#0d9488","#0f766e"],["AR","#10b981","#059669"]].map(([init,f,t],i)=>(
-                <div key={i} className="w-6 h-6 rounded-full border-2 border-[#054a2e] flex items-center justify-center text-[7px] font-bold text-white"
+                <div key={i} className="w-6 h-6 rounded-full border-2 border-white flex items-center justify-center text-[7px] font-bold text-white"
                   style={{ background:`linear-gradient(135deg,${f},${t})`, zIndex:3-i }}>
                   {init}
                 </div>
@@ -134,21 +127,23 @@ export default function SignupHero() {
             </div>
             <div className="flex-1 min-w-0">
               <div className="flex gap-0.5 mb-0.5">{[...Array(5)].map((_,i)=><span key={i} className="text-yellow-400 text-[8px]">★</span>)}</div>
-              <p className="text-white/40 text-[9.5px] leading-snug truncate">Outstanding quality. Best delivery service!</p>
+              <p className="text-gray-500 text-[9.5px] leading-snug truncate">Outstanding quality. Best delivery service!</p>
             </div>
           </div>
 
           {/* Stats */}
-          <div className="grid grid-cols-3 rounded-xl overflow-hidden bg-white/[0.04] border border-white/[0.07]">
+          <div className="grid grid-cols-3 rounded-xl overflow-hidden bg-white/60 border border-gray-200/70">
             {[["50K+","Customers"],["4.9★","Rating"],["< 24h","Delivery"]].map(([val,label],i)=>(
-              <div key={i} className="text-center py-3" style={{ borderLeft:i>0?"1px solid rgba(255,255,255,0.07)":"none" }}>
-                <p className="text-white font-black text-[14px] leading-none" style={{ fontFamily:"'Playfair Display',serif" }}>{val}</p>
-                <p className="text-white/35 text-[8.5px] font-semibold mt-1 uppercase tracking-widest">{label}</p>
+              <div key={i} className="text-center py-3"
+                style={{ borderLeft:i>0?"1px solid rgba(0,0,0,0.06)":"none" }}>
+                <p className="text-gray-900 font-black text-[14px] leading-none"
+                  style={{ fontFamily:"'Playfair Display',serif" }}>{val}</p>
+                <p className="text-gray-400 text-[8.5px] font-semibold mt-1 uppercase tracking-widest">{label}</p>
               </div>
             ))}
           </div>
-        </div>
 
+        </div>
       </div>
     </div>
   );

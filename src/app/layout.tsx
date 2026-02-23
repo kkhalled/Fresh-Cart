@@ -2,19 +2,17 @@ import type { Metadata } from "next";
 import { Geist, Geist_Mono } from "next/font/google";
 import "../styles/globals.css";
 import Navbar from "../components/shared/Navbar";
-import '@fortawesome/fontawesome-svg-core/styles'
+import "@fortawesome/fontawesome-svg-core/styles";
 import Footer from "../components/shared/Footer";
-
-import {Exo} from 'next/font/google'
+import { ToastContainer, Bounce } from "react-toastify";
+import { Exo } from "next/font/google";
+import Providers from "./../providers/providers";
 
 const exo = Exo({
-  subsets:['latin'],
-  weight:['400', '500','600','700'],
-  variable:'--font-exo'
-})
-
-
-
+  subsets: ["latin"],
+  weight: ["400", "500", "600", "700"],
+  variable: "--font-exo",
+});
 
 export const metadata: Metadata = {
   title: "Fresh Cart",
@@ -28,16 +26,15 @@ export default function RootLayout({
 }>) {
   return (
     <html lang="en">
-      <body
-        className={` antialiased ${exo.className} font-medium`}
-      >
-         <Navbar />
-        <div className=" bg-gray-50">
-          <div className="max-w- mx-auto">
-            {children}
+      <body className={` antialiased ${exo.className} font-medium`}>
+        <Providers>
+          <Navbar />
+          <div className=" bg-gray-50">
+            <div className=" mx-auto">{children}</div>
           </div>
-        </div>
-        <Footer/>
+          <Footer />
+        </Providers>
+      
       </body>
     </html>
   );

@@ -2,7 +2,6 @@
 import { AUTH_ENDPOINTS } from "@/src/config/api";
 import { SignUpInputValues, SignUpSchema } from "../schemas/SignUp.schema";
 import axios, { AxiosError, AxiosRequestConfig } from "axios";
-import { log } from "console";
 
 export async function signupAction(values: SignUpInputValues) {
   const valdiationResult = SignUpSchema.safeParse(values);
@@ -29,20 +28,31 @@ export async function signupAction(values: SignUpInputValues) {
     };
     const { data } = await axios.request(options);
     console.log("Signup successful:", data);
-
-    return { success: true, data };
+    if (data.message) {
+      return {
+        success: true,
+        message: "Signup successful! Please sign in to continue.",
+        data, // Include any relevant data returned from the API
+      };
+    } else {
+      return {
+        success: false,
+        message: data.message || "Signup failed. Please try again.",
+      };
+    }
   } catch (error) {
     if (error instanceof AxiosError) {
       console.error("Signup error:", error.response?.data || error.message);
       return {
         success: false,
+        data: error.response?.data,
         message: error.response?.data?.message || "Something went wrong",
       };
+    } else {
+      return {
+        success: false,
+        message: "An unexpected error occurred during signup.",
+      };
     }
-
-    return {
-      success: false,
-      message: "Unexpected error occurred",
-    };
   }
 }
