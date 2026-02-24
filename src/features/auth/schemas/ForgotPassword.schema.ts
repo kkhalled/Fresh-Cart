@@ -7,7 +7,7 @@ export const ForgotPasswordSchema = z.object({
     .pipe(z.email("Invalid email address")),
 });
 
- export  type ForgotPasswordvalues  = z.infer< typeof ForgotPasswordSchema >
+export type ForgotPasswordValues = z.infer<typeof ForgotPasswordSchema>;
 
 
 export const VerifyResetCodeSchema = z.object({

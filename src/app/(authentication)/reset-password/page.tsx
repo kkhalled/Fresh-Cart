@@ -1,10 +1,9 @@
-import ResetPassword from '@/src/features/auth/components/forgotpassword/ResetPassword'
-import VerifyResetCode from '@/src/features/auth/components/forgotpassword/VerifyResetCode'
-import React from 'react'
+import ResetPasswordScreen from "@/src/features/auth/screens/ResetPassword.screen";
 
-export default function ResetCodePage() {
-  return <>
-  
- <ResetPassword/>
-  </>
+export default function ResetPasswordPage() {
+  return (
+    <>
+      <ResetPasswordScreen />
+    </>
+  );
 }

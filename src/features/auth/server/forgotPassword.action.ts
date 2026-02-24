@@ -3,14 +3,14 @@
 
 import {
   ForgotPasswordSchema,
-  ForgotPasswordvalues,
+  ForgotPasswordValues,
   ResetPasswordSchema,
   VerifyResetCodeSchema,
 } from "../schemas/ForgotPassword.schema";
 import { AUTH_ENDPOINTS } from "@/src/config/api";
 import axios, { AxiosError } from "axios";
 
-export async function forgotPasswordAction(values: ForgotPasswordvalues) {
+export async function forgotPasswordAction(values: ForgotPasswordValues) {
   const result = ForgotPasswordSchema.safeParse(values);
 
   if (!result.success) {
@@ -165,7 +165,7 @@ export async function resetPasswordAction(values: ResetPasswordValues) {
     }
   } catch (error) {
     if (error instanceof AxiosError) {
-      console.error( error.response?.data || error.message);
+
       return {
         success: false,
         data: error.response?.data,
@@ -174,7 +174,7 @@ export async function resetPasswordAction(values: ResetPasswordValues) {
     } else {
       return {
         success: false,
-        message: "An unexpected error occurred during signup.",
+        message: "An unexpected error occurred during password reset.",
       };
     }
   }

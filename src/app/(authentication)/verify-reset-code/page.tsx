@@ -1,9 +1,5 @@
-import VerifyResetCode from "@/src/features/auth/components/forgotpassword/VerifyResetCode";
+import VerifyResetCodeScreen from "@/src/features/auth/screens/VerifyResetCode.screen";
 
 export default function VerifyResetCodePage() {
-    return <>
-    
-    <VerifyResetCode/>
-    
-    </>
+  return <VerifyResetCodeScreen />;
 }

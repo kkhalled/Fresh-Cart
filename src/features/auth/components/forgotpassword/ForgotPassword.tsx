@@ -11,7 +11,7 @@ import {
 import Link from "next/link";
 // import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
-import { ForgotPasswordSchema, ForgotPasswordvalues } from "../../schemas/ForgotPassword.schema";
+import { ForgotPasswordSchema, ForgotPasswordValues } from "../../schemas/ForgotPassword.schema";
 import { useForm } from "react-hook-form";
 import { forgotPasswordAction } from "../../server/forgotPassword.action";
 import { toast } from "react-toastify";
@@ -32,7 +32,7 @@ export default function ForgotPassword() {
     resolver: zodResolver(ForgotPasswordSchema),
   });
 
-  async function onSubmit(values: ForgotPasswordvalues) {
+  async function onSubmit(values: ForgotPasswordValues) {
     const response = await forgotPasswordAction(values);
 
     if (response.success) {
