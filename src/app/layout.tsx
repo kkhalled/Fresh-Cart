@@ -25,17 +25,18 @@ export default function RootLayout({
   children: React.ReactNode;
 }>) {
   return (
-    <html lang="en">
-      <body className={` antialiased ${exo.className} font-medium`}>
-        <Providers>
-          <Navbar />
-          <div className=" bg-gray-50">
-            <div className=" mx-auto">{children}</div>
-          </div>
-          <Footer />
-        </Providers>
-      
-      </body>
-    </html>
+    <>
+      <html lang="en">
+        <body className={` antialiased ${exo.className} font-medium`}>
+          <Providers>
+            <Navbar />
+            <div className=" bg-gray-50">
+              <div className=" mx-auto">{children}</div>
+            </div>
+            <Footer />
+          </Providers>
+        </body>
+      </html>
+    </>
   );
 }

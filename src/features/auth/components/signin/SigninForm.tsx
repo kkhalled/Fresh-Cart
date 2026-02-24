@@ -7,6 +7,8 @@ import {
   faLock,
   faArrowRight,
   faSpinner,
+  faEye,
+  faEyeSlash,
 } from "@fortawesome/free-solid-svg-icons";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { useRouter } from "next/navigation";
@@ -15,11 +17,19 @@ import { toast } from "react-toastify";
 import Link from "next/link";
 import Image from "next/image";
 import logo from "../../../../assets/freshcart-logo.svg";
-import { SignInInputValues } from "../../schemas/Signin.schema";
+import { SignInInputValues, SignInSchema } from "../../schemas/Signin.schema";
 import signinAction from "../../server/signin.action";
+import setToken from "../../server/auth.action";
+import { zodResolver } from "@hookform/resolvers/zod";
+import { setAuthenticated } from "../../store/authSlice";
+import { useDispatch } from "react-redux";
+
+import { useState } from "react";
 
 export default function SigninForm() {
   const router = useRouter();
+  const dispatch = useDispatch();
+  const [showPassword, setShowPassword] = useState(false);
   const {
     register,
     handleSubmit,
@@ -27,6 +37,7 @@ export default function SigninForm() {
     setError,
   } = useForm({
     defaultValues: { email: "", password: "", rememberMe: false },
+    resolver: zodResolver(SignInSchema),
     mode: "onSubmit",
   });
 
@@ -36,9 +47,15 @@ export default function SigninForm() {
       const response = await signinAction(values);
       console.log(values);
       if (response?.success) {
-        toast.success("Signed in successfully!" ,{ autoClose: 1800 });
+        await setToken(response.data.token, values.rememberMe ?? false);
+        dispatch(
+          setAuthenticated({
+            isAuthenticated: true,
+            userInfo: response.data.user,
+          }),
+        );
+        toast.success("Signed in successfully!", { autoClose: 1800 });
         console.log(response.data);
-
         setTimeout(() => router.push("/"), 1900);
       } else {
         toast.error(response?.message || "Signin failed.");
@@ -158,17 +175,31 @@ export default function SigninForm() {
                   Forgot Password?
                 </Link>
               </div>
-              <FormInput
-                type="password"
-                placeholder="Enter your password"
-                leftIcon={
+              <div className="relative">
+                <FormInput
+                  type={showPassword ? "text" : "password"}
+                  placeholder="Enter your password"
+                  leftIcon={
+                    <FontAwesomeIcon
+                      icon={faLock}
+                      className="text-gray-300 text-[9px]"
+                    />
+                  }
+                  {...register("password", { required: "Password is required" })}
+                />
+                <button
+                  type="button"
+                  onClick={() => setShowPassword((prev) => !prev)}
+                  className="absolute inset-y-0 right-0 flex items-center pr-3 text-gray-400 hover:text-gray-600"
+                  tabIndex={-1}
+                >
                   <FontAwesomeIcon
-                    icon={faLock}
-                    className="text-gray-300 text-[9px]"
+                    icon={showPassword ? faEyeSlash : faEye}
+                    className="text-xs"
                   />
-                }
-                {...register("password", { required: "Password is required" })}
-              />
+                </button>
+              </div>
+              
               {errors.password && (
                 <p className="text-red-500 text-[10px] mt-0.5 ml-0.5">
                   {errors.password.message as string}

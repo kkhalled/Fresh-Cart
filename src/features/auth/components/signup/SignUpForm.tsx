@@ -47,13 +47,10 @@ export default function SignUpForm() {
         if (response?.errors) {
           Object.values(response.errors).forEach((key) => {
             setError(key as keyof SignUpInputValues, {
-
               message: response.errors[key],
-
             });
           });
         }
-         
       }
     } catch (error) {
       toast.error("An unexpected error occurred during signup.");
