@@ -145,7 +145,7 @@ export default function Navbar() {
   // ==========================================
   
   return (
-    <nav className="w-full relative bg-white sticky top-0 z-50 shadow-sm">
+    <nav className="w-full bg-white sticky top-0 z-50 shadow-sm">
       {/* ==========================================
           TOP BAR - Contact & Settings
           Hidden on mobile, visible on desktop
@@ -253,13 +253,13 @@ export default function Navbar() {
             </button>
 
             {/* Logo - Links to homepage - SMALLER SIZE */}
-            <Link href="/" className="flex items-center flex-shrink-0">
+            <Link href="/" className="flex items-center shrink-0">
               <Image 
                 src={logo} 
                 alt="FreshCart - Fresh Groceries Delivered" 
                 width={100} 
                 height={32} 
-                className="md:w-[120px]"
+                className="md:w-30"
                 priority
               />
             </Link>

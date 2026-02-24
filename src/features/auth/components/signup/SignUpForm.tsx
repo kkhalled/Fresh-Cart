@@ -87,7 +87,7 @@ export default function SignUpForm() {
         <div className="bg-white/75 backdrop-blur-sm rounded-2xl shadow-xl shadow-black/[0.07] border border-gray-200/60 px-6 py-6">
           {/* Header */}
           <div className="text-center mb-5">
-            <div className="inline-flex items-center justify-center w-10 h-10 rounded-2xl bg-gradient-to-br from-green-500 to-emerald-500 shadow-lg shadow-emerald-500/25 mb-2.5">
+            <div className="inline-flex items-center justify-center w-10 h-10 rounded-2xl bg-linear-to-br from-green-500 to-emerald-500 shadow-lg shadow-emerald-500/25 mb-2.5">
               <FontAwesomeIcon
                 icon={faUserPlus}
                 className="text-white text-sm"
@@ -268,7 +268,7 @@ export default function SignUpForm() {
 
             <button
               type="submit"
-              className="fc-submit-btn group relative w-full bg-gradient-to-r from-green-600 via-emerald-500 to-green-600 bg-[length:200%_100%] text-white py-2.5 rounded-xl font-semibold text-[12.5px] hover:bg-right transition-all duration-500 flex items-center justify-center gap-2 shadow-lg shadow-green-600/20 hover:shadow-xl hover:shadow-green-600/30 active:scale-[0.98] overflow-hidden !mt-3"
+              className="fc-submit-btn group relative w-full bg-linear-to-r from-green-600 via-emerald-500 to-green-600 bg-size-[200%_100%] text-white py-2.5 rounded-xl font-semibold text-[12.5px] hover:bg-right transition-all duration-500 flex items-center justify-center gap-2 shadow-lg shadow-green-600/20 hover:shadow-xl hover:shadow-green-600/30 active:scale-[0.98] overflow-hidden mt-3!"
             >
               <span className="relative z-10">Create Account</span>
               {isSubmitting ? (

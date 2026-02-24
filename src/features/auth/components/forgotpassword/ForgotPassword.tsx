@@ -141,7 +141,7 @@ export default function ForgotPassword() {
               <div className="flex items-start gap-3 rounded-lg bg-green-50 px-3 py-2.5 sm:px-4 sm:py-3">
                 <FontAwesomeIcon
                   icon={faShieldHalved}
-                  className="mt-0.5 text-sm text-green-600 flex-shrink-0"
+                  className="mt-0.5 text-sm text-green-600 shrink-0"
                 />
                 <div>
                   <h4 className="text-[11px] font-semibold text-gray-900 uppercase tracking-wide">
