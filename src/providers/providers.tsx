@@ -1,16 +1,27 @@
-'use client'
-import { ReactNode } from "react";
-import { store } from "./../store/store";
+"use client";
+import { ReactNode, useRef } from "react";
+
 import { Provider } from "react-redux";
 import { Bounce, ToastContainer } from "react-toastify";
+import { AppStoreType, createStore, preloadedState } from "../store/store";
+import { AuthState } from "../features/auth/server/auth.action";
 
 type ProvidersProps = {
   children: ReactNode;
+  preloadedState: preloadedState;
 };
-export default function providers({ children }: ProvidersProps) {
+export default function providers({
+  children,
+  preloadedState,
+}: ProvidersProps) {
+  const storeRef = useRef<null | AppStoreType>(null);
+  if (!storeRef.current) {
+    storeRef.current = createStore(preloadedState);
+  }
+
   return (
     <>
-      <Provider store={store}>
+      <Provider store={storeRef.current}>
         {children}
         <ToastContainer
           position="top-right"

@@ -1,6 +1,9 @@
 "use server";
 
+import { AUTH_ENDPOINTS } from "@/src/config/api";
+import axios, { AxiosRequestConfig } from "axios";
 import { cookies } from "next/headers";
+import { User } from "../store/authSlice";
 
 export default async function setToken(
   token: string,
@@ -30,4 +33,53 @@ export async function getToken(): Promise<string | null> {
 export async function clearToken(): Promise<void> {
   const cookieStore = await cookies();
   cookieStore.delete("token");
+}
+
+export type AuthState = {
+  isAuthenticated: boolean;
+  userInfo: null | User;
+  error?: string;
+};
+
+export async function verifyToken(): Promise<AuthState> {
+  const token = await getToken();
+  if (!token) {
+    return {
+      isAuthenticated: false,
+      userInfo: null,
+      error: "No token found",
+    };
+  }
+  try {
+    const options: AxiosRequestConfig = {
+      method: "GET",
+      url: AUTH_ENDPOINTS.verifyToken,
+      headers: {
+        token
+      },
+    };
+
+    const { data } = await axios.request(options);
+
+    const { name, id, email, role } = data.decoded;
+
+    if (data.message === "verified") {
+      return {
+        isAuthenticated: true,
+        userInfo: { name, id, email, role },
+      };
+    } else {
+      return {
+        isAuthenticated: false,
+        userInfo: null,
+        error: "Token verification failed",
+      };
+    }
+  } catch (error) {
+    return {
+      isAuthenticated: false,
+      userInfo: null,
+      error: "Error verifying token",
+    };
+  }
 }

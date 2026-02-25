@@ -8,4 +8,5 @@ export const AUTH_ENDPOINTS = {
   forgotPassword: API_BASE_URL + "auth/forgotPasswords",
   verifyResetCode: API_BASE_URL + "auth/verifyResetCode",
   resetPassword: API_BASE_URL + "auth/resetPassword",
+  verifyToken: API_BASE_URL + "auth/verifyToken",
 };

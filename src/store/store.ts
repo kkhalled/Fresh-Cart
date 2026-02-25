@@ -1,12 +1,20 @@
 import { configureStore } from "@reduxjs/toolkit";
-import { authReducer } from "../features/auth/store/authSlice";
+import { authReducer, User } from "../features/auth/store/authSlice";
+import { AuthState } from "../features/auth/server/auth.action";
 
-export const store = configureStore({
-  reducer: {
-    auth: authReducer,
-  },
-  
-});
+ export  type preloadedState = {
+  auth: AuthState;
+};
 
-export type AppStore = typeof store;
-export type AppState = ReturnType<typeof store.getState>;
+export function createStore(preloadedState: preloadedState) {
+  const store = configureStore({
+    reducer: {
+      auth: authReducer,
+    },
+    preloadedState,
+  });
+
+  return store;
+}
+export type AppStoreType = ReturnType<typeof createStore>;
+export type AppState = ReturnType<AppStoreType["getState"]>;

@@ -12,565 +12,542 @@ import {
   faUserPlus,
   faBars,
   faTimes,
+  faMapMarkerAlt,
+  faTruck,
 } from "@fortawesome/free-solid-svg-icons";
 
 import {
-  faAddressCard,
   faHeart,
   faUser,
 } from "@fortawesome/free-regular-svg-icons";
 
 import logo from "../../assets/freshcart-logo.svg";
-import NavigationBar from "./NavigationBar";
 import Link from "next/link";
 import { useSelector } from "react-redux";
 import { AppState } from "@/src/store/store";
+import { toast } from "react-toastify";
+import useLogout from "@/src/hooks/useLogout";
 
-/**
- * Main Navigation Component
- * 
- * Features:
- * - Responsive design (mobile & desktop)
- * - Multi-language support
- * - Multi-currency support
- * - User authentication states
- * - Mobile slide-out menu
- * - Search functionality
- * - Shopping cart integration
- * 
- * @component
- */
 export default function Navbar() {
-  // ==========================================
-  // STATE MANAGEMENT
-  // ==========================================
-  
-  /** Selected language state */
   const [language, setLanguage] = useState("English");
-  
-  /** Selected currency state */
   const [currency, setCurrency] = useState("USD");
-  
-  /** Mobile menu open/close state */
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
-  
-  /** Mobile search bar visibility state */
   const [isMobileSearchOpen, setIsMobileSearchOpen] = useState(false);
-  
-  /** Search query input state */
   const [searchQuery, setSearchQuery] = useState("");
-  
-  /** Check if user is authenticated from Redux store */
+  const [isScrolled, setIsScrolled] = useState(false);
+
   const isAuthenticated = useSelector(
     (state: AppState) => state.auth.isAuthenticated,
   );
-
-  /** Get cart items count from Redux store (example - adjust to your store structure) */
   const cartItemsCount = 3;
 
-  // ==========================================
-  // SIDE EFFECTS
-  // ==========================================
-  
-  /**
-   * Prevent body scroll when mobile menu is open
-   * This improves UX by preventing background scroll
-   */
+  // Scroll effect
+  useEffect(() => {
+    const handleScroll = () => {
+      setIsScrolled(window.scrollY > 10);
+    };
+    window.addEventListener("scroll", handleScroll);
+    return () => window.removeEventListener("scroll", handleScroll);
+  }, []);
+
   useEffect(() => {
     if (isMobileMenuOpen) {
-      document.body.style.overflow = 'hidden';
+      document.body.style.overflow = "hidden";
     } else {
-      document.body.style.overflow = 'unset';
+      document.body.style.overflow = "unset";
     }
-    
-    // Cleanup function
     return () => {
-      document.body.style.overflow = 'unset';
+      document.body.style.overflow = "unset";
     };
   }, [isMobileMenuOpen]);
 
-  /**
-   * Close mobile menu on window resize to desktop
-   * Prevents menu staying open when switching to desktop view
-   */
   useEffect(() => {
     const handleResize = () => {
-      if (window.innerWidth >= 768 && isMobileMenuOpen) {
-        setIsMobileMenuOpen(false);
+      if (window.innerWidth >= 768) {
+        if (isMobileMenuOpen) {
+          setIsMobileMenuOpen(false);
+        }
+        if (isMobileSearchOpen) {
+          setIsMobileSearchOpen(false);
+        }
       }
     };
+    window.addEventListener("resize", handleResize);
+    return () => window.removeEventListener("resize", handleResize);
+  }, [isMobileMenuOpen, isMobileSearchOpen]);
 
-    window.addEventListener('resize', handleResize);
-    return () => window.removeEventListener('resize', handleResize);
-  }, [isMobileMenuOpen]);
-
-  // ==========================================
-  // EVENT HANDLERS
-  // ==========================================
-  
-  /**
-   * Handle search submission
-   * @param {React.FormEvent} e - Form event
-   */
   const handleSearch = (e: React.FormEvent) => {
     e.preventDefault();
     if (searchQuery.trim()) {
-      // Navigate to search results page or trigger search
       console.log("Searching for:", searchQuery);
-      // Example: router.push(`/search?q=${searchQuery}`);
     }
   };
 
-  /**
-   * Handle logout action
-   * Clears user session and redirects
-   */
-  const handleLogout = () => {
-    // Dispatch logout action
-    // dispatch(logout());
+  const { logout } = useLogout();
+
+  const handleLogout = async () => {
     setIsMobileMenuOpen(false);
-    console.log("User logged out");
+    logout();
+    toast.success("Logged out successfully", { autoClose: 1000 });
   };
 
-  /**
-   * Close mobile menu
-   * Used by multiple components to close the menu
-   */
   const closeMobileMenu = () => {
     setIsMobileMenuOpen(false);
   };
 
-  // ==========================================
-  // RENDER
-  // ==========================================
-  
   return (
-    <nav className="w-full bg-white sticky top-0 z-50 shadow-sm">
-      {/* ==========================================
-          TOP BAR - Contact & Settings
-          Hidden on mobile, visible on desktop
-          ========================================== */}
-      <div className="hidden md:block bg-gray-50 border-b border-gray-200">
-        <div className="max-w-7xl mx-auto px-4 py-2 flex justify-between items-center text-xs">
-          {/* Left side - Contact information */}
-          <div className="flex items-center gap-6">
-            <Link
-              href="tel:+18001234567"
-              className="flex items-center gap-2 text-gray-600 hover:text-green-600 transition-colors duration-200"
-              aria-label="Call customer service"
-            >
-              <FontAwesomeIcon icon={faPhone} className="text-xs" />
-              <span>+1 (800) 123-4567</span>
-            </Link>
-            <Link
-              href="mailto:support@freshcart.com"
-              className="flex items-center gap-2 text-gray-600 hover:text-green-600 transition-colors duration-200"
-              aria-label="Email customer support"
-            >
-              <FontAwesomeIcon icon={faEnvelope} className="text-xs" />
-              <span>support@freshcart.com</span>
-            </Link>
-          </div>
-          
-          {/* Right side - Quick links & settings */}
-          <div className="flex items-center gap-4">
-            <Link 
-              href="/track-order" 
-              className="text-gray-600 hover:text-green-600 transition-colors duration-200"
-            >
-              Track Order
-            </Link>
-            <Link 
-              href="/about" 
-              className="text-gray-600 hover:text-green-600 transition-colors duration-200"
-            >
-              About
-            </Link>
-            <Link 
-              href="/contact" 
-              className="text-gray-600 hover:text-green-600 transition-colors duration-200"
-            >
-              Contact
-            </Link>
-            
-            {/* Currency selector */}
-            <div className="relative">
-              <select
-                value={currency}
-                onChange={(e) => setCurrency(e.target.value)}
-                className="appearance-none bg-transparent text-gray-600 hover:text-green-600 pr-6 cursor-pointer focus:outline-none transition-colors duration-200"
-                aria-label="Select currency"
-              >
-                <option value="USD">USD</option>
-                <option value="EGP">EGP</option>
-                <option value="EUR">EUR</option>
-              </select>
-              <FontAwesomeIcon
-                icon={faChevronDown}
-                className="absolute right-0 top-1/2 -translate-y-1/2 text-xs text-gray-600 pointer-events-none"
-              />
+    <nav
+      className={`w-full bg-white sticky top-0 z-50 transition-all duration-300 animate-nav-drop-in ${
+        isScrolled ? "shadow-lg" : "shadow-sm"
+      }`}
+    >
+      {/* ===== TOP BAR - Desktop Only ===== */}
+      <div className="hidden md:block bg-linear-to-r from-green-600 via-green-500 to-green-600">
+        <div className="max-w-7xl mx-auto px-6">
+          <div className="flex justify-between items-center h-9">
+            {/* Left: Promo Banner */}
+            <div className="flex items-center gap-2 text-white text-xs">
+              <FontAwesomeIcon icon={faTruck} className="text-[11px]" />
+              <span className="font-medium">
+                Free delivery on orders over $50 | Same-day delivery available
+              </span>
             </div>
-            
-            {/* Language selector */}
-            <div className="relative">
-              <select
-                value={language}
-                onChange={(e) => setLanguage(e.target.value)}
-                className="appearance-none bg-transparent text-gray-600 hover:text-green-600 pr-6 cursor-pointer focus:outline-none transition-colors duration-200"
-                aria-label="Select language"
+
+            {/* Right: Links & Settings */}
+            <div className="flex items-center gap-3 text-white text-xs">
+              <Link
+                href="/track-order"
+                className="hover:text-green-100 transition-colors font-medium"
               >
-                <option value="English">English</option>
-                <option value="Arabic">Arabic</option>
-              </select>
-              <FontAwesomeIcon
-                icon={faChevronDown}
-                className="absolute right-0 top-1/2 -translate-y-1/2 text-xs text-gray-600 pointer-events-none"
-              />
+                Track Order
+              </Link>
+              <span className="text-green-300">|</span>
+              <Link
+                href="/about"
+                className="hover:text-green-100 transition-colors font-medium"
+              >
+                About
+              </Link>
+              <span className="text-green-300">|</span>
+              <Link
+                href="/contact"
+                className="hover:text-green-100 transition-colors font-medium"
+              >
+                Help
+              </Link>
+              <span className="text-green-300 mx-1">|</span>
+
+              {/* Currency */}
+              <div className="relative">
+                <select
+                  value={currency}
+                  onChange={(e) => setCurrency(e.target.value)}
+                  className="appearance-none bg-transparent text-white pr-4 cursor-pointer focus:outline-none font-medium text-xs hover:text-green-100 transition-colors"
+                  aria-label="Select currency"
+                >
+                  <option value="USD" className="text-gray-800">
+                    USD
+                  </option>
+                  <option value="EGP" className="text-gray-800">
+                    EGP
+                  </option>
+                  <option value="EUR" className="text-gray-800">
+                    EUR
+                  </option>
+                </select>
+                <FontAwesomeIcon
+                  icon={faChevronDown}
+                  className="absolute right-0 top-1/2 -translate-y-1/2 text-[8px] pointer-events-none"
+                />
+              </div>
+
+              {/* Language */}
+              <div className="relative">
+                <select
+                  value={language}
+                  onChange={(e) => setLanguage(e.target.value)}
+                  className="appearance-none bg-transparent text-white pr-4 cursor-pointer focus:outline-none font-medium text-xs hover:text-green-100 transition-colors"
+                  aria-label="Select language"
+                >
+                  <option value="English" className="text-gray-800">
+                    EN
+                  </option>
+                  <option value="Arabic" className="text-gray-800">
+                    AR
+                  </option>
+                </select>
+                <FontAwesomeIcon
+                  icon={faChevronDown}
+                  className="absolute right-0 top-1/2 -translate-y-1/2 text-[8px] pointer-events-none"
+                />
+              </div>
             </div>
           </div>
         </div>
       </div>
 
-      {/* ==========================================
-          MAIN HEADER - Logo, Search, Actions
-          Responsive layout for all screen sizes
-          ========================================== */}
-      <div className="bg-white border-b border-gray-200">
-        <div className="max-w-7xl mx-auto px-4 py-3">
-          <div className="flex justify-between items-center gap-4">
-            
-            {/* Mobile menu toggle button */}
+      {/* ===== MAIN HEADER ===== */}
+      <div className="bg-white border-b border-gray-100">
+        <div className="max-w-7xl mx-auto px-4 md:px-6">
+          <div className="relative flex items-center justify-between h-16 md:h-18">
+            {/* Mobile Menu Button */}
             <button
-              onClick={() => setIsMobileMenuOpen(!isMobileMenuOpen)}
-              className="md:hidden text-gray-600 hover:text-green-600 p-2 -ml-2 transition-colors duration-200"
+              onClick={() => {
+                setIsMobileSearchOpen(false);
+                setIsMobileMenuOpen(!isMobileMenuOpen);
+              }}
+              className="md:hidden text-gray-700 hover:text-green-600 p-2 -ml-2 transition-colors"
               aria-label="Toggle mobile menu"
               aria-expanded={isMobileMenuOpen}
             >
-              <FontAwesomeIcon 
-                icon={isMobileMenuOpen ? faTimes : faBars} 
-                className="text-xl" 
+              <FontAwesomeIcon
+                icon={isMobileMenuOpen ? faTimes : faBars}
+                className="text-md"
               />
             </button>
 
-            {/* Logo - Links to homepage - SMALLER SIZE */}
-            <Link href="/" className="flex items-center shrink-0">
-              <Image 
-                src={logo} 
-                alt="FreshCart - Fresh Groceries Delivered" 
-                width={100} 
-                height={32} 
-                className="md:w-30"
+            {/* Logo */}
+            <Link
+              href="/"
+              className="absolute left-1/2 -translate-x-1/2 flex items-center shrink-0 md:static md:translate-x-0"
+            >
+              <Image
+                src={logo}
+                alt="FreshCart"
+                width={95}
+                height={30}
+                className="md:w-28.75"
                 priority
               />
             </Link>
 
-            {/* Desktop Search Bar - SMALLER & CLEANER */}
-            <form 
+            {/* Search Bar - Desktop */}
+            <form
               onSubmit={handleSearch}
-              className="hidden lg:flex flex-1 max-w-xl mx-6"
+              className="hidden lg:flex flex-1 max-w-xl mx-8"
             >
-              <div className="relative w-full">
+              <div className="relative w-full group">
+                <div className="absolute inset-y-0 left-0 pl-4 flex items-center pointer-events-none">
+                  <FontAwesomeIcon
+                    icon={faSearch}
+                    className="text-gray-400 text-sm group-focus-within:text-green-600 transition-colors"
+                  />
+                </div>
                 <input
                   type="search"
                   value={searchQuery}
                   onChange={(e) => setSearchQuery(e.target.value)}
-                  placeholder="Search for products..."
-                  className="w-full px-3.5 py-2 pr-10 text-sm border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-green-500 focus:border-transparent transition-all duration-200"
+                  placeholder="Search fresh groceries..."
+                  className="w-full pl-11 pr-4 py-2.5 text-sm border-2 border-gray-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-green-500 focus:border-green-500 transition-all bg-gray-50 focus:bg-white placeholder:text-gray-400"
                   aria-label="Search products"
                 />
-                <button 
-                  type="submit"
-                  className="absolute right-2.5 top-1/2 -translate-y-1/2 text-gray-400 hover:text-green-600 transition-colors duration-200"
-                  aria-label="Submit search"
-                >
-                  <FontAwesomeIcon icon={faSearch} className="text-sm" />
-                </button>
               </div>
             </form>
 
-            {/* Mobile Quick Actions - Search & Cart only */}
-            <div className="flex items-center gap-2 md:hidden">
+            {/* Mobile Actions */}
+            <div className="flex items-center gap-1 md:hidden">
               <button
-                onClick={() => setIsMobileSearchOpen(!isMobileSearchOpen)}
-                className="text-gray-600 hover:text-green-600 p-2 transition-colors duration-200"
+                onClick={() => {
+                  setIsMobileMenuOpen(false);
+                  setIsMobileSearchOpen(!isMobileSearchOpen);
+                }}
+                className="text-gray-700 hover:text-green-600 p-2 transition-colors"
                 aria-label="Toggle search"
                 aria-expanded={isMobileSearchOpen}
               >
-                <FontAwesomeIcon icon={faSearch} className="text-lg" />
+                <FontAwesomeIcon icon={faSearch} className="text-md" />
               </button>
-              <Link 
-                href="/cart" 
-                className="relative text-gray-600 hover:text-green-600 p-2 transition-colors duration-200"
+              <Link
+                href="/cart"
+                className="relative text-gray-700 hover:text-green-600 p-2 transition-colors"
                 aria-label={`Shopping cart with ${cartItemsCount} items`}
               >
-                <FontAwesomeIcon icon={faCartShopping} className="text-lg" />
+                <FontAwesomeIcon icon={faCartShopping} className="text-md" />
                 {cartItemsCount > 0 && (
-                  <span className="absolute -top-1 -right-1 bg-green-600 text-white text-[10px] font-bold rounded-full w-5 h-5 flex items-center justify-center">
+                  <span className="absolute -top-0.5 -right-0.5 bg-green-600 text-white text-[9px] font-bold rounded-full w-4 h-4 flex items-center justify-center shadow-md">
                     {cartItemsCount}
                   </span>
                 )}
               </Link>
             </div>
 
-            {/* Desktop Action Icons - Full navigation */}
-            <div className="hidden md:flex items-center gap-3 lg:gap-5">
-              
+            {/* Desktop Actions */}
+            <div className="hidden md:flex items-center gap-6">
               {/* Wishlist */}
               <Link
                 href="/wishlist"
-                className="flex flex-col items-center text-gray-600 hover:text-green-600 transition-colors duration-200 group"
+                className="flex items-center gap-2 text-gray-700 hover:text-green-600 transition-colors group"
                 aria-label="View wishlist"
               >
-                <FontAwesomeIcon 
-                  icon={faHeart} 
-                  className="text-[18px] mb-1 group-hover:scale-110 transition-transform duration-200" 
+                <FontAwesomeIcon
+                  icon={faHeart}
+                  className="text-md group-hover:scale-110 transition-transform"
                 />
-                <span className="text-[10px] font-medium">Wishlist</span>
+                <span className="text-sm font-semibold hidden lg:block">
+                  Wishlist
+                </span>
               </Link>
 
-              {/* Shopping Cart with badge */}
+              {/* Cart */}
               <Link
                 href="/cart"
-                className="flex flex-col items-center text-gray-600 hover:text-green-600 relative transition-colors duration-200 group"
+                className="flex items-center gap-2 text-gray-700 hover:text-green-600 transition-colors group"
                 aria-label={`Shopping cart with ${cartItemsCount} items`}
               >
                 <div className="relative">
                   <FontAwesomeIcon
                     icon={faCartShopping}
-                    className="text-[18px] mb-1 group-hover:scale-110 transition-transform duration-200"
+                    className="text-md group-hover:scale-110 transition-transform"
                   />
                   {cartItemsCount > 0 && (
-                    <span className="absolute -top-2 -right-2 bg-green-600 text-white text-[10px] font-bold rounded-full w-5 h-5 flex items-center justify-center animate-pulse">
+                    <span className="absolute -top-2 -right-2 bg-green-600 text-white text-[9px] font-bold rounded-full w-4 h-4 flex items-center justify-center shadow-md">
                       {cartItemsCount}
                     </span>
                   )}
                 </div>
-                <span className="text-[10px] font-medium">Cart</span>
+                <span className="text-sm font-semibold hidden lg:block">
+                  Cart
+                </span>
               </Link>
 
-              {/* Account */}
-              <Link
-                href="/account"
-                className="flex flex-col items-center text-gray-600 hover:text-green-600 transition-colors duration-200 group"
-                aria-label="My account"
-              >
-                <FontAwesomeIcon 
-                  icon={faUser} 
-                  className="text-[18px] mb-1 group-hover:scale-110 transition-transform duration-200" 
-                />
-                <span className="text-[10px] font-medium">Account</span>
-              </Link>
+              {/* Divider */}
+              <div className="h-8 w-px bg-gray-200"></div>
 
-              {/* Authentication Actions - Conditional rendering */}
+              {/* Auth Actions */}
               {isAuthenticated ? (
-                // Logout button for authenticated users
-                <button
-                  onClick={handleLogout}
-                  className="flex flex-col items-center text-gray-600 hover:text-red-600 transition-colors duration-200 group"
-                  aria-label="Log out"
-                >
-                  <FontAwesomeIcon 
-                    icon={faSignOutAlt} 
-                    className="text-[18px] mb-1 group-hover:scale-110 transition-transform duration-200" 
-                  />
-                  <span className="text-[10px] font-medium">Log Out</span>
-                </button>
-              ) : (
-                // Sign Up & Sign In for guest users
-                <React.Fragment>
+                <>
                   <Link
-                    href="/signup"
-                    className="flex flex-col items-center text-gray-600 hover:text-green-600 transition-colors duration-200 group"
-                    aria-label="Sign up"
-                  >
-                    <FontAwesomeIcon 
-                      icon={faUserPlus} 
-                      className="text-[18px] mb-1 group-hover:scale-110 transition-transform duration-200" 
-                    />
-                    <span className="text-[10px] font-medium">Sign Up</span>
-                  </Link>
-                  <Link
-                    href="/signin"
-                    className="flex flex-col items-center text-gray-600 hover:text-green-600 transition-colors duration-200 group"
-                    aria-label="Sign in"
+                    href="/account"
+                    className="flex items-center gap-2 text-gray-700 hover:text-green-600 transition-colors group"
+                    aria-label="My account"
                   >
                     <FontAwesomeIcon
-                      icon={faAddressCard}
-                      className="text-[18px] mb-1 group-hover:scale-110 transition-transform duration-200"
+                      icon={faUser}
+                      className="text-md group-hover:scale-110 transition-transform"
                     />
-                    <span className="text-[10px] font-medium">Log In</span>
+                    <span className="text-sm font-semibold hidden lg:block">
+                      Account
+                    </span>
                   </Link>
-                </React.Fragment>
+                  <button
+                    onClick={handleLogout}
+                    className="flex items-center gap-2 text-gray-700 hover:text-red-600 transition-colors group"
+                    aria-label="Log out"
+                  >
+                    <FontAwesomeIcon
+                      icon={faSignOutAlt}
+                      className="text-md group-hover:scale-110 transition-transform"
+                    />
+                    <span className="text-sm font-semibold hidden lg:block">
+                      Logout
+                    </span>
+                  </button>
+                </>
+              ) : (
+                <>
+                  <Link
+                    href="/signin"
+                    className="flex items-center gap-2 text-gray-700 hover:text-green-600 transition-colors group"
+                  >
+                    <FontAwesomeIcon
+                      icon={faUser}
+                      className="text-md group-hover:scale-110 transition-transform"
+                    />
+                    <span className="text-sm font-semibold hidden lg:block">
+                      Sign In
+                    </span>
+                  </Link>
+                  <Link
+                    href="/signup"
+                    className="flex items-center gap-2 text-gray-700 hover:text-green-600 transition-colors group"
+                  >
+                    <FontAwesomeIcon
+                      icon={faUserPlus}
+                      className="text-md group-hover:scale-110 transition-transform"
+                    />
+                    <span className="text-sm font-semibold hidden lg:block">
+                      Sign Up
+                    </span>
+                  </Link>
+                </>
               )}
             </div>
           </div>
 
-          {/* Mobile Search Bar - Expandable - CLEANER SIZE */}
+          {/* Mobile Search */}
           {isMobileSearchOpen && (
-            <form 
+            <form
               onSubmit={handleSearch}
-              className="mt-3 lg:hidden transition-all duration-200"
+              className="pb-3 lg:hidden animate-fade-in"
             >
               <div className="relative">
+                <div className="absolute inset-y-0 left-0 pl-3.5 flex items-center pointer-events-none">
+                  <FontAwesomeIcon
+                    icon={faSearch}
+                    className="text-gray-400 text-sm"
+                  />
+                </div>
                 <input
                   type="search"
                   value={searchQuery}
                   onChange={(e) => setSearchQuery(e.target.value)}
-                  placeholder="Search for products..."
-                  className="w-full px-3.5 py-2 pr-10 text-sm border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-green-500 focus:border-transparent"
+                  placeholder="Search products..."
+                  className="w-full pl-10 pr-4 py-2.5 text-sm border-2 border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-green-500 focus:border-green-500 bg-gray-50"
                   autoFocus
                   aria-label="Search products"
                 />
-                <button 
-                  type="submit"
-                  className="absolute right-2.5 top-1/2 -translate-y-1/2 text-gray-400 hover:text-green-600 transition-colors duration-200"
-                  aria-label="Submit search"
-                >
-                  <FontAwesomeIcon icon={faSearch} className="text-sm" />
-                </button>
               </div>
             </form>
           )}
         </div>
       </div>
 
-      {/* ==========================================
-          MOBILE MENU DRAWER
-          Slide-in menu from left with backdrop
-          ========================================== */}
-      {isMobileMenuOpen && (
-        <React.Fragment>
-          {/* Backdrop overlay - Closes menu on click */}
-          <div 
-            className="fixed inset-0 bg-black/50 z-40 md:hidden backdrop-blur-sm transition-opacity duration-200"
-            onClick={closeMobileMenu}
-            aria-hidden="true"
+      {/* ===== MOBILE MENU ===== */}
+{isMobileMenuOpen && (
+  <>
+    {/* Backdrop */}
+    <div
+      className="fixed inset-0 bg-black/40 h-dvh z-40 md:hidden backdrop-blur-sm transition-opacity duration-200"
+      onClick={closeMobileMenu}
+      aria-hidden="true"
+    />
+
+    {/* Slide Menu */}
+    <aside
+      className="fixed top-0 left-0 h-dvh w-70 max-w-[85vw] bg-white z-50 shadow-2xl md:hidden overflow-y-auto overscroll-contain transition-transform duration-200"
+      role="dialog"
+      aria-label="Mobile navigation menu"
+      aria-modal="true"
+    >
+      <div className="p-5">
+        {/* Header */}
+        <div className="flex items-center justify-between mb-6 pb-4 border-b border-gray-200">
+          <Image
+            src={logo}
+            alt="FreshCart"
+            width={110}
+            height={36}
+            className="h-8 w-auto"
           />
-          
-          {/* Sliding menu panel */}
-          <aside 
-            className="fixed top-0 left-0 h-full w-80 bg-white z-50 shadow-2xl transition-transform duration-300 md:hidden overflow-y-auto"
-            role="dialog"
-            aria-label="Mobile navigation menu"
+          <button
+            onClick={closeMobileMenu}
+            className="text-gray-600 hover:text-green-600 p-2 transition-colors"
+            aria-label="Close menu"
           >
-            <div className="p-6">
-              
-              {/* Close button */}
-              <button
+            <FontAwesomeIcon icon={faTimes} className="text-xl" />
+          </button>
+        </div>
+
+        {/* User Section */}
+        <div className="space-y-3 mb-6 pb-6 border-b border-gray-200">
+          {isAuthenticated ? (
+            <>
+              <Link
+                href="/account"
                 onClick={closeMobileMenu}
-                className="absolute top-4 right-4 text-gray-600 hover:text-green-600 p-2 transition-colors duration-200"
-                aria-label="Close menu"
+                className="flex items-center gap-3 p-3 rounded-xl hover:bg-green-50 transition-colors"
               >
-                <FontAwesomeIcon icon={faTimes} className="text-xl" />
+                <div className="w-10 h-10 bg-green-100 rounded-full flex items-center justify-center">
+                  <FontAwesomeIcon
+                    icon={faUser}
+                    className="text-green-600"
+                  />
+                </div>
+                <span className="text-gray-800 font-semibold">
+                  My Account
+                </span>
+              </Link>
+              <Link
+                href="/wishlist"
+                onClick={closeMobileMenu}
+                className="flex items-center gap-3 p-3 rounded-xl hover:bg-green-50 transition-colors"
+              >
+                <div className="w-10 h-10 bg-pink-100 rounded-full flex items-center justify-center">
+                  <FontAwesomeIcon
+                    icon={faHeart}
+                    className="text-pink-600"
+                  />
+                </div>
+                <span className="text-gray-800 font-semibold">
+                  Wishlist
+                </span>
+              </Link>
+              <button
+                onClick={handleLogout}
+                className="w-full flex items-center gap-3 p-3 rounded-xl hover:bg-red-50 transition-colors text-left"
+              >
+                <div className="w-10 h-10 bg-red-100 rounded-full flex items-center justify-center">
+                  <FontAwesomeIcon
+                    icon={faSignOutAlt}
+                    className="text-red-600"
+                  />
+                </div>
+                <span className="text-gray-800 font-semibold">
+                  Logout
+                </span>
               </button>
+            </>
+          ) : (
+            <>
+              <Link
+                href="/signin"
+                onClick={closeMobileMenu}
+                className="block w-full bg-linear-to-r from-green-600 to-green-500 text-white text-center py-3 rounded-xl font-bold hover:from-green-700 hover:to-green-600 transition-all shadow-md"
+              >
+                Sign In
+              </Link>
+              <Link
+                href="/signup"
+                onClick={closeMobileMenu}
+                className="block w-full border-2 border-green-600 text-green-600 text-center py-3 rounded-xl font-bold hover:bg-green-50 transition-all"
+              >
+                Sign Up
+              </Link>
+            </>
+          )}
+        </div>
 
-              {/* Menu Logo - SMALLER */}
-              <div className="mb-8 pr-8">
-                <Image 
-                  src={logo} 
-                  alt="FreshCart" 
-                  width={130} 
-                  height={42}
-                />
-              </div>
+        {/* Rest of your menu unchanged */}
 
-              {/* ========================================
-                  USER ACTIONS SECTION
-                  Different content for auth vs guest
-                  ======================================== */}
-              <div className="space-y-4 mb-8 pb-8 border-b border-gray-200">
-                {isAuthenticated ? (
-                  // Authenticated user menu
-                  <React.Fragment>
-                    <Link
-                      href="/account"
-                      onClick={closeMobileMenu}
-                      className="flex items-center gap-3 p-3 rounded-lg hover:bg-green-50 transition-colors duration-200"
-                    >
-                      <FontAwesomeIcon icon={faUser} className="text-gray-600 text-lg" />
-                      <span className="text-gray-700 font-medium">My Account</span>
-                    </Link>
-                    <Link
-                      href="/wishlist"
-                      onClick={closeMobileMenu}
-                      className="flex items-center gap-3 p-3 rounded-lg hover:bg-green-50 transition-colors duration-200"
-                    >
-                      <FontAwesomeIcon icon={faHeart} className="text-gray-600 text-lg" />
-                      <span className="text-gray-700 font-medium">Wishlist</span>
-                    </Link>
-                    <button
-                      onClick={handleLogout}
-                      className="w-full flex items-center gap-3 p-3 rounded-lg hover:bg-red-50 transition-colors duration-200 text-left"
-                    >
-                      <FontAwesomeIcon icon={faSignOutAlt} className="text-gray-600 text-lg" />
-                      <span className="text-gray-700 font-medium">Log Out</span>
-                    </button>
-                  </React.Fragment>
-                ) : (
-                  // Guest user CTA buttons
-                  <React.Fragment>
-                    <Link
-                      href="/signin"
-                      onClick={closeMobileMenu}
-                      className="block w-full bg-green-600 text-white text-center py-3 rounded-lg font-semibold hover:bg-green-700 transition-all duration-200 shadow-md hover:shadow-lg"
-                    >
-                      Sign In
-                    </Link>
-                    <Link
-                      href="/signup"
-                      onClick={closeMobileMenu}
-                      className="block w-full border-2 border-green-600 text-green-600 text-center py-3 rounded-lg font-semibold hover:bg-green-50 transition-all duration-200"
-                    >
-                      Sign Up
-                    </Link>
-                  </React.Fragment>
-                )}
-              </div>
-
-              {/* ========================================
-                  QUICK LINKS SECTION
-                  ======================================== */}
-              <nav className="space-y-2 mb-8" aria-label="Quick links">
-                <h3 className="text-xs font-semibold text-gray-500 uppercase tracking-wide mb-3">
-                  Quick Links
+              {/* Quick Links */}
+              <nav className="space-y-1 mb-6">
+                <h3 className="text-[10px] font-bold text-gray-500 uppercase tracking-wider mb-3 px-2">
+                  Quick Access
                 </h3>
                 <Link
                   href="/track-order"
                   onClick={closeMobileMenu}
-                  className="block py-2 text-gray-700 hover:text-green-600 transition-colors duration-200 font-medium"
+                  className="flex items-center gap-3 py-2.5 px-3 text-gray-700 hover:text-green-600 hover:bg-green-50 rounded-lg transition-colors font-medium"
                 >
+                  <FontAwesomeIcon icon={faMapMarkerAlt} className="text-sm" />
                   Track Order
                 </Link>
                 <Link
                   href="/about"
                   onClick={closeMobileMenu}
-                  className="block py-2 text-gray-700 hover:text-green-600 transition-colors duration-200 font-medium"
+                  className="flex items-center gap-3 py-2.5 px-3 text-gray-700 hover:text-green-600 hover:bg-green-50 rounded-lg transition-colors font-medium"
                 >
-                  About
+                  About Us
                 </Link>
                 <Link
                   href="/contact"
                   onClick={closeMobileMenu}
-                  className="block py-2 text-gray-700 hover:text-green-600 transition-colors duration-200 font-medium"
+                  className="flex items-center gap-3 py-2.5 px-3 text-gray-700 hover:text-green-600 hover:bg-green-50 rounded-lg transition-colors font-medium"
                 >
-                  Contact
+                  Contact & Help
                 </Link>
               </nav>
 
-              {/* ========================================
-                  SETTINGS SECTION
-                  Currency & Language selectors
-                  ======================================== */}
-              <div className="space-y-4 pt-8 border-t border-gray-200">
-                <h3 className="text-xs font-semibold text-gray-500 uppercase tracking-wide mb-3">
-                  Settings
+              {/* Settings */}
+              <div className="space-y-4 pt-6 border-t border-gray-200">
+                <h3 className="text-[10px] font-bold text-gray-500 uppercase tracking-wider mb-3 px-2">
+                  Preferences
                 </h3>
-                
-                {/* Currency selector */}
+
                 <div>
-                  <label 
-                    htmlFor="mobile-currency" 
-                    className="block text-sm text-gray-600 mb-2 font-medium"
+                  <label
+                    htmlFor="mobile-currency"
+                    className="block text-xs text-gray-600 mb-2 px-2 font-semibold"
                   >
                     Currency
                   </label>
@@ -578,7 +555,7 @@ export default function Navbar() {
                     id="mobile-currency"
                     value={currency}
                     onChange={(e) => setCurrency(e.target.value)}
-                    className="w-full px-4 py-2.5 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-green-500 bg-white transition-all duration-200"
+                    className="w-full px-4 py-2.5 border-2 border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-green-500 bg-white text-sm font-medium"
                   >
                     <option value="USD">USD - US Dollar</option>
                     <option value="EGP">EGP - Egyptian Pound</option>
@@ -586,11 +563,10 @@ export default function Navbar() {
                   </select>
                 </div>
 
-                {/* Language selector */}
                 <div>
-                  <label 
-                    htmlFor="mobile-language" 
-                    className="block text-sm text-gray-600 mb-2 font-medium"
+                  <label
+                    htmlFor="mobile-language"
+                    className="block text-xs text-gray-600 mb-2 px-2 font-semibold"
                   >
                     Language
                   </label>
@@ -598,46 +574,38 @@ export default function Navbar() {
                     id="mobile-language"
                     value={language}
                     onChange={(e) => setLanguage(e.target.value)}
-                    className="w-full px-4 py-2.5 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-green-500 bg-white transition-all duration-200"
+                    className="w-full px-4 py-2.5 border-2 border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-green-500 bg-white text-sm font-medium"
                   >
                     <option value="English">English</option>
-                    <option value="Arabic">العربية (Arabic)</option>
+                    <option value="Arabic">Arabic</option>
                   </select>
                 </div>
               </div>
 
-              {/* ========================================
-                  CONTACT SECTION
-                  ======================================== */}
-              <div className="mt-8 pt-8 border-t border-gray-200">
-                <h3 className="text-xs font-semibold text-gray-500 uppercase tracking-wide mb-4">
-                  Contact Us
+              {/* Contact */}
+              <div className="mt-6 pt-6 border-t border-gray-200 bg-gray-50 -mx-5 px-5 py-4 rounded-t-3xl">
+                <h3 className="text-[10px] font-bold text-gray-500 uppercase tracking-wider mb-3">
+                  Get in Touch
                 </h3>
                 <Link
                   href="tel:+18001234567"
-                  className="flex items-center gap-3 text-gray-600 hover:text-green-600 mb-3 transition-colors duration-200"
+                  className="flex items-center gap-2 text-gray-700 hover:text-green-600 mb-2 text-sm transition-colors"
                 >
-                  <FontAwesomeIcon icon={faPhone} className="text-sm" />
-                  <span className="text-sm font-medium">+1 (800) 123-4567</span>
+                  <FontAwesomeIcon icon={faPhone} className="text-xs" />
+                  <span className="font-medium">+1 (800) 123-4567</span>
                 </Link>
                 <Link
                   href="mailto:support@freshcart.com"
-                  className="flex items-center gap-3 text-gray-600 hover:text-green-600 transition-colors duration-200"
+                  className="flex items-center gap-2 text-gray-700 hover:text-green-600 text-sm transition-colors"
                 >
-                  <FontAwesomeIcon icon={faEnvelope} className="text-sm" />
-                  <span className="text-sm font-medium">support@freshcart.com</span>
+                  <FontAwesomeIcon icon={faEnvelope} className="text-xs" />
+                  <span className="font-medium">support@freshcart.com</span>
                 </Link>
               </div>
             </div>
           </aside>
-        </React.Fragment>
+        </>
       )}
-
-      {/* ==========================================
-          NAVIGATION MENU (Optional)
-          Can be uncommented for category navigation
-          ========================================== */}
-      {/* <NavigationBar /> */}
     </nav>
   );
 }

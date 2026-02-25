@@ -10,6 +10,7 @@ import { zodResolver } from "@hookform/resolvers/zod";
 import { VerifyResetCodeSchema } from "../../schemas/ForgotPassword.schema";
 import { toast } from "react-toastify";
 import {
+  forgotPasswordAction,
   VerifyCodeValues,
   verifyResetCodeAction,
 } from "../../server/forgotPassword.action";
@@ -65,6 +66,17 @@ export default function VerifyResetCode() {
       toast.error(response.message || "Failed to verify code");
     }
   };
+
+  async function handleResendCode() {
+    // Implement resend code logic here
+    
+     const response = await forgotPasswordAction({ email });
+     if (response.success) {
+       toast.success("Verification code resent successfully");
+     } else {
+       toast.error(response.message || "Failed to resend verification code");
+     }
+  }
 
   return (
     <div className="min-h-[calc(100vh-120px)] bg-gray-50 py-10 px-4 sm:px-6 lg:px-8">
@@ -160,6 +172,7 @@ export default function VerifyResetCode() {
               </p>
               <button
                 type="button"
+                  onClick={handleResendCode}
                 className="text-green-600 font-semibold hover:text-green-700"
               >
                 Resend Code
