@@ -18,7 +18,6 @@ export const metadata: Metadata = {
   description: "Fresh groceries delivered fast",
   icons: {
     icon: "/mini-logo.png",
-    
   },
 };
 
@@ -30,7 +29,7 @@ export default async function RootLayout({
   const verifyTokenResult = await verifyToken();
   console.log(verifyTokenResult);
 
-  return (
+  return <>
     <html lang="en">
       <body className={` antialiased ${exo.className} font-medium`}>
         <Providers preloadedState={{ auth: verifyTokenResult }}>
@@ -38,5 +37,5 @@ export default async function RootLayout({
         </Providers>
       </body>
     </html>
-  );
+  </>;
 }

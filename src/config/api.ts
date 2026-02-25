@@ -10,3 +10,8 @@ export const AUTH_ENDPOINTS = {
   resetPassword: API_BASE_URL + "auth/resetPassword",
   verifyToken: API_BASE_URL + "auth/verifyToken",
 };
+
+export const CATEGORY_ENDPOINTS = {
+  allCategories: API_BASE_URL + "categories",
+  categoryById: (id: string) => `${API_BASE_URL}categories/${id}`,
+};

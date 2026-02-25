@@ -16,10 +16,7 @@ import {
   faTruck,
 } from "@fortawesome/free-solid-svg-icons";
 
-import {
-  faHeart,
-  faUser,
-} from "@fortawesome/free-regular-svg-icons";
+import { faHeart, faUser } from "@fortawesome/free-regular-svg-icons";
 
 import logo from "../../assets/freshcart-logo.svg";
 import Link from "next/link";
@@ -27,6 +24,7 @@ import { useSelector } from "react-redux";
 import { AppState } from "@/src/store/store";
 import { toast } from "react-toastify";
 import useLogout from "@/src/hooks/useLogout";
+import NavigationBar from "./NavigationBar";
 
 export default function Navbar() {
   const [language, setLanguage] = useState("English");
@@ -34,20 +32,28 @@ export default function Navbar() {
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
   const [isMobileSearchOpen, setIsMobileSearchOpen] = useState(false);
   const [searchQuery, setSearchQuery] = useState("");
-  const [isScrolled, setIsScrolled] = useState(false);
+  const [isAtTop, setIsAtTop] = useState(true);
 
   const isAuthenticated = useSelector(
     (state: AppState) => state.auth.isAuthenticated,
   );
   const cartItemsCount = 3;
 
-  // Scroll effect
+  // Scroll effect - hide navbar when not at top
   useEffect(() => {
+    let timeoutId: NodeJS.Timeout;
     const handleScroll = () => {
-      setIsScrolled(window.scrollY > 10);
+      clearTimeout(timeoutId);
+      timeoutId = setTimeout(() => {
+        const scrollPosition = window.scrollY;
+        setIsAtTop(scrollPosition < 10);
+      }, 50);
     };
-    window.addEventListener("scroll", handleScroll);
-    return () => window.removeEventListener("scroll", handleScroll);
+    window.addEventListener("scroll", handleScroll, { passive: true });
+    return () => {
+      window.removeEventListener("scroll", handleScroll);
+      clearTimeout(timeoutId);
+    };
   }, []);
 
   useEffect(() => {
@@ -96,13 +102,13 @@ export default function Navbar() {
   };
 
   return (
-    <nav
-      className={`w-full bg-white sticky top-0 z-50 transition-all duration-300 animate-nav-drop-in ${
-        isScrolled ? "shadow-lg" : "shadow-sm"
-      }`}
-    >
+    <nav className="w-full bg-white sticky top-0 z-50 shadow-sm">
       {/* ===== TOP BAR - Desktop Only ===== */}
-      <div className="hidden md:block bg-linear-to-r from-green-600 via-green-500 to-green-600">
+      <div
+        className={`hidden md:block bg-linear-to-r from-green-600 via-green-500 to-green-600 transition-all duration-500 ease-in-out overflow-hidden ${
+          isAtTop ? "max-h-20 opacity-100" : "max-h-0 opacity-0"
+        }`}
+      >
         <div className="max-w-7xl mx-auto px-6">
           <div className="flex justify-between items-center h-9">
             {/* Left: Promo Banner */}
@@ -189,7 +195,7 @@ export default function Navbar() {
       {/* ===== MAIN HEADER ===== */}
       <div className="bg-white border-b border-gray-100">
         <div className="max-w-7xl mx-auto px-4 md:px-6">
-          <div className="relative flex items-center justify-between h-16 md:h-18">
+          <div className="relative flex items-center justify-between h-16 ">
             {/* Mobile Menu Button */}
             <button
               onClick={() => {
@@ -402,112 +408,121 @@ export default function Navbar() {
         </div>
       </div>
 
+      {/* ===== NAVIGATION BAR ===== */}
+      <div
+        className={`transition-all duration-500 ease-in-out ${
+          isAtTop ? "max-h-32 opacity-100" : "max-h-0 opacity-0 overflow-hidden"
+        }`}
+      >
+        <NavigationBar />
+      </div>
+
       {/* ===== MOBILE MENU ===== */}
-{isMobileMenuOpen && (
-  <>
-    {/* Backdrop */}
-    <div
-      className="fixed inset-0 bg-black/40 h-dvh z-40 md:hidden backdrop-blur-sm transition-opacity duration-200"
-      onClick={closeMobileMenu}
-      aria-hidden="true"
-    />
-
-    {/* Slide Menu */}
-    <aside
-      className="fixed top-0 left-0 h-dvh w-70 max-w-[85vw] bg-white z-50 shadow-2xl md:hidden overflow-y-auto overscroll-contain transition-transform duration-200"
-      role="dialog"
-      aria-label="Mobile navigation menu"
-      aria-modal="true"
-    >
-      <div className="p-5">
-        {/* Header */}
-        <div className="flex items-center justify-between mb-6 pb-4 border-b border-gray-200">
-          <Image
-            src={logo}
-            alt="FreshCart"
-            width={110}
-            height={36}
-            className="h-8 w-auto"
-          />
-          <button
+      {isMobileMenuOpen && (
+        <>
+          {/* Backdrop */}
+          <div
+            className="fixed inset-0 bg-black/40 h-dvh z-40 md:hidden backdrop-blur-sm transition-opacity duration-200"
             onClick={closeMobileMenu}
-            className="text-gray-600 hover:text-green-600 p-2 transition-colors"
-            aria-label="Close menu"
+            aria-hidden="true"
+          />
+
+          {/* Slide Menu */}
+          <aside
+            className="fixed top-0 left-0 h-dvh w-70 max-w-[85vw] bg-white z-50 shadow-2xl md:hidden overflow-y-auto overscroll-contain transition-transform duration-200"
+            role="dialog"
+            aria-label="Mobile navigation menu"
+            aria-modal="true"
           >
-            <FontAwesomeIcon icon={faTimes} className="text-xl" />
-          </button>
-        </div>
+            <div className="p-5">
+              {/* Header */}
+              <div className="flex items-center justify-between mb-6 pb-4 border-b border-gray-200">
+                <Image
+                  src={logo}
+                  alt="FreshCart"
+                  width={110}
+                  height={36}
+                  className="h-8 w-auto"
+                />
+                <button
+                  onClick={closeMobileMenu}
+                  className="text-gray-600 hover:text-green-600 p-2 transition-colors"
+                  aria-label="Close menu"
+                >
+                  <FontAwesomeIcon icon={faTimes} className="text-xl" />
+                </button>
+              </div>
 
-        {/* User Section */}
-        <div className="space-y-3 mb-6 pb-6 border-b border-gray-200">
-          {isAuthenticated ? (
-            <>
-              <Link
-                href="/account"
-                onClick={closeMobileMenu}
-                className="flex items-center gap-3 p-3 rounded-xl hover:bg-green-50 transition-colors"
-              >
-                <div className="w-10 h-10 bg-green-100 rounded-full flex items-center justify-center">
-                  <FontAwesomeIcon
-                    icon={faUser}
-                    className="text-green-600"
-                  />
-                </div>
-                <span className="text-gray-800 font-semibold">
-                  My Account
-                </span>
-              </Link>
-              <Link
-                href="/wishlist"
-                onClick={closeMobileMenu}
-                className="flex items-center gap-3 p-3 rounded-xl hover:bg-green-50 transition-colors"
-              >
-                <div className="w-10 h-10 bg-pink-100 rounded-full flex items-center justify-center">
-                  <FontAwesomeIcon
-                    icon={faHeart}
-                    className="text-pink-600"
-                  />
-                </div>
-                <span className="text-gray-800 font-semibold">
-                  Wishlist
-                </span>
-              </Link>
-              <button
-                onClick={handleLogout}
-                className="w-full flex items-center gap-3 p-3 rounded-xl hover:bg-red-50 transition-colors text-left"
-              >
-                <div className="w-10 h-10 bg-red-100 rounded-full flex items-center justify-center">
-                  <FontAwesomeIcon
-                    icon={faSignOutAlt}
-                    className="text-red-600"
-                  />
-                </div>
-                <span className="text-gray-800 font-semibold">
-                  Logout
-                </span>
-              </button>
-            </>
-          ) : (
-            <>
-              <Link
-                href="/signin"
-                onClick={closeMobileMenu}
-                className="block w-full bg-linear-to-r from-green-600 to-green-500 text-white text-center py-3 rounded-xl font-bold hover:from-green-700 hover:to-green-600 transition-all shadow-md"
-              >
-                Sign In
-              </Link>
-              <Link
-                href="/signup"
-                onClick={closeMobileMenu}
-                className="block w-full border-2 border-green-600 text-green-600 text-center py-3 rounded-xl font-bold hover:bg-green-50 transition-all"
-              >
-                Sign Up
-              </Link>
-            </>
-          )}
-        </div>
+              {/* User Section */}
+              <div className="space-y-3 mb-6 pb-6 border-b border-gray-200">
+                {isAuthenticated ? (
+                  <>
+                    <Link
+                      href="/account"
+                      onClick={closeMobileMenu}
+                      className="flex items-center gap-3 p-3 rounded-xl hover:bg-green-50 transition-colors"
+                    >
+                      <div className="w-10 h-10 bg-green-100 rounded-full flex items-center justify-center">
+                        <FontAwesomeIcon
+                          icon={faUser}
+                          className="text-green-600"
+                        />
+                      </div>
+                      <span className="text-gray-800 font-semibold">
+                        My Account
+                      </span>
+                    </Link>
+                    <Link
+                      href="/wishlist"
+                      onClick={closeMobileMenu}
+                      className="flex items-center gap-3 p-3 rounded-xl hover:bg-green-50 transition-colors"
+                    >
+                      <div className="w-10 h-10 bg-pink-100 rounded-full flex items-center justify-center">
+                        <FontAwesomeIcon
+                          icon={faHeart}
+                          className="text-pink-600"
+                        />
+                      </div>
+                      <span className="text-gray-800 font-semibold">
+                        Wishlist
+                      </span>
+                    </Link>
+                    <button
+                      onClick={handleLogout}
+                      className="w-full flex items-center gap-3 p-3 rounded-xl hover:bg-red-50 transition-colors text-left"
+                    >
+                      <div className="w-10 h-10 bg-red-100 rounded-full flex items-center justify-center">
+                        <FontAwesomeIcon
+                          icon={faSignOutAlt}
+                          className="text-red-600"
+                        />
+                      </div>
+                      <span className="text-gray-800 font-semibold">
+                        Logout
+                      </span>
+                    </button>
+                  </>
+                ) : (
+                  <>
+                    <Link
+                      href="/signin"
+                      onClick={closeMobileMenu}
+                      className="block w-full bg-linear-to-r from-green-600 to-green-500 text-white text-center py-3 rounded-xl font-bold hover:from-green-700 hover:to-green-600 transition-all shadow-md"
+                    >
+                      Sign In
+                    </Link>
+                    <Link
+                      href="/signup"
+                      onClick={closeMobileMenu}
+                      className="block w-full border-2 border-green-600 text-green-600 text-center py-3 rounded-xl font-bold hover:bg-green-50 transition-all"
+                    >
+                      Sign Up
+                    </Link>
+                  </>
+                )}
+              </div>
 
-        {/* Rest of your menu unchanged */}
+              {/* Rest of your menu unchanged */}
 
               {/* Quick Links */}
               <nav className="space-y-1 mb-6">
