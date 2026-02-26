@@ -28,7 +28,7 @@ export default function CategorySection() {
   }, []);
 
   return (
-    <section className="w-full py-12 lg:py-20 bg-linear-to-b from-gray-50/50 to-white">
+    <section className="w-full py-12 lg:py-20 bg-white">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         {/* Enhanced Header */}
         <div className="text-center mb-12 lg:mb-16">

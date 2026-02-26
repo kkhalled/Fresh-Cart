@@ -63,9 +63,9 @@ export default function Slider() {
         className="
           relative w-full
           [&_.swiper-pagination]:bottom-4!
-          [&_.swiper-pagination-bullet]:w-2.5
-          [&_.swiper-pagination-bullet]:h-2.5
-          [&_.swiper-pagination-bullet]:bg-white/50
+          [&_.swiper-pagination-bullet]:w-3!
+          [&_.swiper-pagination-bullet]:h-3!
+          [&_.swiper-pagination-bullet]:bg-black!
           [&_.swiper-pagination-bullet]:opacity-100
           [&_.swiper-pagination-bullet]:transition-all
           [&_.swiper-pagination-bullet]:duration-300

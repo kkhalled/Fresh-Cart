@@ -2,6 +2,7 @@ import Navbar from "@/src/components/shared/Navbar";
 import Footer from "@/src/components/shared/Footer";
 import PageTransition from "@/src/components/layout/PageTransition";
 import NavigationBar from "@/src/components/shared/NavigationBar";
+import Breadcrumb from "@/src/components/shared/Breadcrumb";
 
 export default function ShopLayout({
   children,
@@ -11,6 +12,8 @@ export default function ShopLayout({
   return (
     <>
       <Navbar />
+      <NavigationBar />
+      <Breadcrumb />
       
       <main className="bg-gray-50 min-h-screen">
         <PageTransition>

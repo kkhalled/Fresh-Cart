@@ -18,11 +18,10 @@ const allowedCategories = ['electronics', "women's-fashion", "men's-fashion", 'b
 
 const navigationLinks = [
   { name: 'Home', href: '/' },
-  { name: 'Shop', href: '/shop' },
+  { name: 'Shop', href: '/products' },
   { name: 'Deals', href: '/deals' },
-  { name: 'New Arrivals', href: '/new-arrivals' },
   { name: 'Brands', href: '/brands' },
-  { name: 'Recipes', href: '/recipes' },
+  
 ];
 
 export default function NavigationBar() {
@@ -78,7 +77,7 @@ export default function NavigationBar() {
   return (
     <>
       {/* Navigation Menu */}
-      <div className="bg-gray-50 border-b border-gray-200">
+      <div className="bg-gray-50 border-[.10px] border-gray-50">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="flex items-center justify-between h-14">
             {/* Desktop Navigation */}

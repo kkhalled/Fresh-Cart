@@ -101,4 +101,20 @@
   .animate-nav-drop-in {
     animation: nav-drop-in 0.45s cubic-bezier(0.22, 0.61, 0.36, 1) both;
   }
+
+  .scrollbar-hide {
+    -ms-overflow-style: none;
+    scrollbar-width: none;
+  }
+
+  .scrollbar-hide::-webkit-scrollbar {
+    display: none;
+  }
+}
+body{
+
+  ::selection {
+    background-color: #00BF4B;
+    color:  #ffffff;
+  }
 }

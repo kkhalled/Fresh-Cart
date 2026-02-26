@@ -1,6 +1,11 @@
-import React from "react";
+import ProductDetailsPage from "@/src/features/products/components/singleProduct/ProductDetailsPage";
 
-export default function ProductPage() {
-  return <div></div>;
+interface ProductDetailPageProps {
+  params: {
+    id: string;
+  };
 }
-
+export default async function ProductDetailPage({params }: ProductDetailPageProps) {
+  const { id } = await params;
+  return <ProductDetailsPage id={id} />;
+}

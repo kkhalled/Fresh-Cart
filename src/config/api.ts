@@ -15,3 +15,13 @@ export const CATEGORY_ENDPOINTS = {
   allCategories: API_BASE_URL + "categories",
   categoryById: (id: string) => `${API_BASE_URL}categories/${id}`,
 };
+
+export const BRAND_ENDPOINTS = {
+  allBrands: API_BASE_URL + "brands",
+  brandById: API_BASE_URL + "brands",
+};
+
+export const PRODUCTS_ENDPOINTS = {
+  allProducts: API_BASE_URL + "products",
+  productById: API_BASE_URL + "products" ,
+};

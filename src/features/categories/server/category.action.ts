@@ -15,3 +15,14 @@ export default async function getAllCategories(): Promise<CategoriesResponse> {
     throw error;
   }
 }
+
+export async function getCategoryById(id: string) {
+  try {
+    const options: AxiosRequestConfig = {
+      method: "GET",
+      url: CATEGORY_ENDPOINTS.categoryById + `/${id}`,
+    };
+  } catch (error) {
+    throw error;
+  }
+}

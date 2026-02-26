@@ -1,10 +1,11 @@
-import React from "react";
+import React from 'react'
 
-export default function CategoriesPage() {
-  return (
-    <>
-      <h2>Categories Page</h2>
-    </>
-  );
+export default function SpecificCategoryPage() {
+  return <>
+  
+
+  <h2>Specific Category Page</h2>
+  
+   
+  </>
 }
-

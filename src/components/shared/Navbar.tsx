@@ -24,7 +24,7 @@ import { useSelector } from "react-redux";
 import { AppState } from "@/src/store/store";
 import { toast } from "react-toastify";
 import useLogout from "@/src/hooks/useLogout";
-import NavigationBar from "./NavigationBar";
+
 
 export default function Navbar() {
   const [language, setLanguage] = useState("English");
@@ -409,13 +409,7 @@ export default function Navbar() {
       </div>
 
       {/* ===== NAVIGATION BAR ===== */}
-      <div
-        className={`transition-all duration-500 ease-in-out ${
-          isAtTop ? "max-h-32 opacity-100" : "max-h-0 opacity-0 overflow-hidden"
-        }`}
-      >
-        <NavigationBar />
-      </div>
+    
 
       {/* ===== MOBILE MENU ===== */}
       {isMobileMenuOpen && (
