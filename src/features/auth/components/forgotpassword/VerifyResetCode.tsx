@@ -3,80 +3,23 @@
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faShieldHalved } from "@fortawesome/free-solid-svg-icons";
 import Link from "next/link";
-import { useRouter, useSearchParams } from "next/navigation";
-import { useForm } from "react-hook-form";
-import { useRef } from "react";
-import { zodResolver } from "@hookform/resolvers/zod";
-import { VerifyResetCodeSchema } from "../../schemas/ForgotPassword.schema";
-import { toast } from "react-toastify";
-import {
-  forgotPasswordAction,
-  VerifyCodeValues,
-  verifyResetCodeAction,
-} from "../../server/forgotPassword.action";
-
-const CODE_LENGTH = 6;
-
-type VerifyCodeFormValues = {
-  resetCode: string;
-};
+import useVerifyResetCode from "../../hooks/useVerifyResetCode";
 
 export default function VerifyResetCode() {
-  const router = useRouter();
-  const searchParams = useSearchParams();
-  const email = searchParams.get("email") || "";
-
   const {
+    email,
+    resetCode,
+    inputRef,
+    ref,
+    rest,
+    handleChange,
     handleSubmit,
-    register,
-    setValue,
-    setError,
-    watch,
-    formState: { isSubmitting, errors },
-  } = useForm<VerifyCodeFormValues>({
-    defaultValues: { resetCode: "" },
-    resolver: zodResolver(VerifyResetCodeSchema),
-  });
-
-  const resetCode = watch("resetCode") || "";
-  const inputRef = useRef<HTMLInputElement | null>(null);
-
-  const { ref, ...rest } = register("resetCode");
-
-  const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    const value = e.target.value.replace(/\D/g, "");
-    setValue("resetCode", value.slice(0, CODE_LENGTH), {
-      shouldValidate: true,
-    });
-  };
-
-  const onSubmit = async (values: VerifyCodeValues) => {
-    const response = await verifyResetCodeAction(values);
-
-    if (response.success) {
-      toast.success(response.message);
-      router.push(`/reset-password?email=${email}`);
-    } else {
-      if (response.message) {
-        setError("resetCode", {
-          type: "server",
-          message: response.message,
-        });
-      }
-      toast.error(response.message || "Failed to verify code");
-    }
-  };
-
-  async function handleResendCode() {
-    // Implement resend code logic here
-    
-     const response = await forgotPasswordAction({ email });
-     if (response.success) {
-       toast.success("Verification code resent successfully");
-     } else {
-       toast.error(response.message || "Failed to resend verification code");
-     }
-  }
+    onSubmit,
+    handleResendCode,
+    isSubmitting,
+    errors,
+    CODE_LENGTH,
+  } = useVerifyResetCode();
 
   return (
     <div className="min-h-[calc(100vh-120px)] bg-gray-50 py-10 px-4 sm:px-6 lg:px-8">

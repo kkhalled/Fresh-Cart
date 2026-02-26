@@ -1,13 +1,9 @@
 "use client";
-import { useState, useEffect } from "react";
 import Image from "next/image";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faArrowLeft, faBoxOpen, faStar, faDollarSign, faShoppingBag } from "@fortawesome/free-solid-svg-icons";
 import Link from "next/link";
-import { getBrandById } from "../server/brand.action";
-import { getProducts } from "../../products/server/products.action";
-import { Brand } from "../types/brand.type";
-import { Product } from "../../products/types/products.types";
+import { useBrandDetails } from "../hooks/useBrandDetails";
 import ProductCard from "../../products/components/ProductCard";
 import StatsCard from "../components/StatsCard";
 
@@ -16,40 +12,7 @@ interface BrandDetailsScreenProps {
 }
 
 export default function BrandDetailsScreen({ brandId }: BrandDetailsScreenProps) {
-  const [brand, setBrand] = useState<Brand | null>(null);
-  const [products, setProducts] = useState<Product[]>([]);
-  const [loading, setLoading] = useState(true);
-  const [error, setError] = useState<string | null>(null);
-
-  useEffect(() => {
-    const fetchBrandAndProducts = async () => {
-      try {
-        setLoading(true);
-        setError(null);
-
-        // Fetch brand details and all products in parallel
-        const [brandResponse, productsResponse] = await Promise.all([
-          getBrandById(brandId),
-          getProducts(),
-        ]);
-
-        setBrand(brandResponse.data);
-
-        // Filter products by brand ID
-        const brandProducts = productsResponse.data.filter(
-          (product) => product.brand._id === brandId
-        );
-        setProducts(brandProducts);
-      } catch (err) {
-        console.error("Failed to fetch brand details:", err);
-        setError("Failed to load brand details. Please try again later.");
-      } finally {
-        setLoading(false);
-      }
-    };
-
-    fetchBrandAndProducts();
-  }, [brandId]);
+  const { brand, products, loading, error, avgRating, startingPrice } = useBrandDetails(brandId);
 
   if (loading) {
     return (
@@ -144,15 +107,13 @@ export default function BrandDetailsScreen({ brandId }: BrandDetailsScreenProps)
                 <StatsCard
                   icon={faStar}
                   label="Avg Rating"
-                  value={(
-                    products.reduce((sum, p) => sum + p.ratingsAverage, 0) / products.length
-                  ).toFixed(1)}
+                  value={avgRating}
                   color="orange"
                 />
                 <StatsCard
                   icon={faDollarSign}
                   label="Starting From"
-                  value={`$${Math.min(...products.map(p => p.priceAfterDiscount || p.price))}`}
+                  value={`$${startingPrice}`}
                   color="blue"
                 />
               </div>

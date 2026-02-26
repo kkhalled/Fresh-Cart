@@ -9,53 +9,11 @@ import {
   faUser,
 } from "@fortawesome/free-solid-svg-icons";
 import { FormInput } from "../../../../components/ui/FormInput";
-import { useForm } from "react-hook-form";
-import { SignUpInputValues, SignUpSchema } from "../../schemas/SignUp.schema";
-import { signupAction } from "../../server/signup.action";
-import { zodResolver } from "@hookform/resolvers/zod";
-import { toast } from "react-toastify";
-import { useRouter } from "next/navigation";
 import Link from "next/link";
+import useSignup from "../../hooks/useSignup";
 
 export default function SignUpForm() {
-  const router = useRouter();
-  const {
-    register,
-    handleSubmit,
-    formState: { errors, isSubmitting },
-    setError,
-  } = useForm<SignUpInputValues>({
-    defaultValues: {
-      name: "",
-      email: "",
-      password: "",
-      rePassword: "",
-      phone: "",
-      terms: false,
-    },
-    resolver: zodResolver(SignUpSchema),
-    mode: "onSubmit",
-  });
-
-  async function onSubmit(values: SignUpInputValues) {
-    try {
-      const response = await signupAction(values);
-      if (response.success) {
-        toast.success(response.message);
-        setTimeout(() => router.push("/login"), 2500);
-      } else {
-        if (response?.errors) {
-          Object.values(response.errors).forEach((key) => {
-            setError(key as keyof SignUpInputValues, {
-              message: response.errors[key],
-            });
-          });
-        }
-      }
-    } catch (error) {
-      toast.error("An unexpected error occurred during signup.");
-    }
-  }
+  const { register, handleSubmit, errors, onSubmit, isSubmitting } = useSignup();
 
   return (
     <div className="relative w-full h-full flex items-center justify-center overflow-hidden">

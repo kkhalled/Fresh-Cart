@@ -1,48 +1,12 @@
 "use client";
-import { useState, useEffect } from "react";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faSearch } from "@fortawesome/free-solid-svg-icons";
-import { getAllBrands } from "../server/brand.action";
-import { Brand } from "../types/brand.type";
+import { useAllBrands } from "../hooks/useAllBrands";
 import BrandCard from "../components/BrandCard";
 import BrandsSkeleton from "../components/BrandsSkeleton";
 
 export default function AllBrandsScreen() {
-  const [brands, setBrands] = useState<Brand[]>([]);
-  const [filteredBrands, setFilteredBrands] = useState<Brand[]>([]);
-  const [loading, setLoading] = useState(true);
-  const [error, setError] = useState<string | null>(null);
-  const [searchQuery, setSearchQuery] = useState("");
-
-  useEffect(() => {
-    const fetchBrands = async () => {
-      try {
-        setLoading(true);
-        setError(null);
-        const response = await getAllBrands();
-        setBrands(response.data);
-        setFilteredBrands(response.data);
-      } catch (err) {
-        console.error("Failed to fetch brands:", err);
-        setError("Failed to load brands. Please try again later.");
-      } finally {
-        setLoading(false);
-      }
-    };
-
-    fetchBrands();
-  }, []);
-
-  useEffect(() => {
-    if (searchQuery.trim() === "") {
-      setFilteredBrands(brands);
-    } else {
-      const filtered = brands.filter((brand) =>
-        brand.name.toLowerCase().includes(searchQuery.toLowerCase())
-      );
-      setFilteredBrands(filtered);
-    }
-  }, [searchQuery, brands]);
+  const { brands: filteredBrands, totalBrands, loading, error, searchQuery, setSearchQuery } = useAllBrands();
 
   if (loading) {
     return <BrandsSkeleton />;
@@ -88,7 +52,7 @@ export default function AllBrandsScreen() {
       {/* Results Count */}
       <div className="mb-6">
         <p className="text-sm text-gray-600">
-          Showing {filteredBrands.length} of {brands.length} brands
+          Showing {filteredBrands.length} of {totalBrands} brands
         </p>
       </div>
 

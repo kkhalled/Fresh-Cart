@@ -3,54 +3,16 @@ import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import {
   faShieldHalved,
   faEnvelope,
-  faArrowRight,
   faLock,
+  faArrowRight,
   faQuestionCircle,
   faHeadset,
 } from "@fortawesome/free-solid-svg-icons";
 import Link from "next/link";
-// import { useForm } from "react-hook-form";
-import { zodResolver } from "@hookform/resolvers/zod";
-import { ForgotPasswordSchema, ForgotPasswordValues } from "../../schemas/ForgotPassword.schema";
-import { useForm } from "react-hook-form";
-import { forgotPasswordAction } from "../../server/forgotPassword.action";
-import { toast } from "react-toastify";
-import { useRouter } from "next/navigation";
-
+import useForgotPassword from "../../hooks/useForgotPassword";
 
 export default function ForgotPassword() {
-  const router = useRouter();
-  const {
-    register,
-    handleSubmit,
-    setError,
-    formState: { errors },
-  } = useForm({
-    defaultValues: {
-      email: "",
-    },
-    resolver: zodResolver(ForgotPasswordSchema),
-  });
-
-  async function onSubmit(values: ForgotPasswordValues) {
-    const response = await forgotPasswordAction(values);
-
-    if (response.success) {
-      toast.success(response.message || "Reset email sent successfully!");
-      setTimeout(() => router.push(`/verify-reset-code?email=${values.email}`), 2500);
-      return;
-    }
-
-    // Handle backend validation error on email (e.g. "There is no user registered with this email address ...")
-    if (response.message) {
-      setError("email", {
-        type: "server",
-        message: response.message,
-      });
-    } else {
-      toast.error("Failed to send reset email.");
-    }
-  }
+  const { register, handleSubmit, errors, isSubmitting, onSubmit } = useForgotPassword();
 
   return (
     <div className="min-h-[calc(100vh-120px)] bg-gray-50 py-10 px-4 sm:px-6 lg:px-8">

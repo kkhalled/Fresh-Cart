@@ -8,68 +8,20 @@ import {
   faEyeSlash,
 } from "@fortawesome/free-solid-svg-icons";
 import Link from "next/link";
-import { useState } from "react";
-import { useForm } from "react-hook-form";
-import { zodResolver } from "@hookform/resolvers/zod";
-import { useRouter, useSearchParams } from "next/navigation";
-import { toast } from "react-toastify";
-import {
-  ResetPasswordFormValues,
-  ResetPasswordSchema,
-} from "../../schemas/ForgotPassword.schema";
-import { resetPasswordAction } from "../../server/forgotPassword.action";
+import useResetPassword from "../../hooks/useResetPassword";
 
 export default function ResetPassword() {
-  const searchParams = useSearchParams();
-  const emailFromQuery = searchParams.get("email") || "";
-  const router = useRouter();
-
-  const [showNewPassword, setShowNewPassword] = useState(false);
-  const [showConfirmPassword, setShowConfirmPassword] = useState(false);
-
   const {
     register,
     handleSubmit,
-    setError,
-    formState: { errors, isSubmitting },
-  } = useForm<ResetPasswordFormValues>({
-    defaultValues: {
-      email: emailFromQuery,
-      newPassword: "",
-      confirmPassword: "",
-    },
-    resolver: zodResolver(ResetPasswordSchema),
-  });
-
-  const onSubmit = async (values: ResetPasswordFormValues) => {
-    const response = await resetPasswordAction(values);
-
-    if (response.success) {
-      toast.success(response.message || "Password reset successfully");
-      setTimeout(() => router.push("/signin"), 2500);
-      return;
-    }
-
-    if (response.errors) {
-      // Use Object.values plus the key to map backend errors
-      const keys = Object.keys(response.errors);
-      Object.values(response.errors).forEach((message, index) => {
-        const field = keys[index] as keyof ResetPasswordFormValues;
-        setError(field, {
-          type: "server",
-          message: message as string,
-        });
-      });
-    } else if (response.message) {
-      // Business error like "email not found" – show under email
-      setError("email", {
-        type: "server",
-        message: response.message,
-      });
-    }
-
-    toast.error(response.message || "Failed to reset password");
-  };
+    errors,
+    isSubmitting,
+    showNewPassword,
+    showConfirmPassword,
+    toggleNewPassword,
+    toggleConfirmPassword,
+    onSubmit,
+  } = useResetPassword();
   return (
     <div className="min-h-[calc(100vh-120px)] bg-gray-50 py-10 px-4 sm:px-6 lg:px-8">
       <div className="max-w-4xl mx-auto flex flex-col items-center gap-8">
@@ -147,7 +99,7 @@ export default function ResetPassword() {
                   />
                   <button
                     type="button"
-                    onClick={() => setShowNewPassword((prev) => !prev)}
+                    onClick={toggleNewPassword}
                     className="absolute inset-y-0 right-0 flex items-center pr-3 text-gray-400 hover:text-gray-600"
                   >
                     <FontAwesomeIcon
@@ -193,7 +145,7 @@ export default function ResetPassword() {
                   />
                   <button
                     type="button"
-                    onClick={() => setShowConfirmPassword((prev) => !prev)}
+                    onClick={toggleConfirmPassword}
                     className="absolute inset-y-0 right-0 flex items-center pr-3 text-gray-400 hover:text-gray-600"
                   >
                     <FontAwesomeIcon

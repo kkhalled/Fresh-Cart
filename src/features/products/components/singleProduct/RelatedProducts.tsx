@@ -1,12 +1,10 @@
 'use client';
-import { useEffect, useState } from "react";
 import { Swiper, SwiperSlide } from "swiper/react";
 import { Navigation } from "swiper/modules";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faChevronLeft, faChevronRight } from "@fortawesome/free-solid-svg-icons";
 import ProductCard from "../ProductCard";
-import { Product } from "../../types/products.types";
-import { getProducts } from "../../server/products.action";
+import { useRelatedProducts } from "../../hooks/useRelatedProducts";
 
 import "swiper/css";
 import "swiper/css/navigation";
@@ -17,32 +15,7 @@ interface RelatedProductsProps {
 }
 
 export default function RelatedProducts({ categoryId, currentProductId }: RelatedProductsProps) {
-  const [relatedProducts, setRelatedProducts] = useState<Product[]>([]);
-  const [loading, setLoading] = useState(true);
-
-  useEffect(() => {
-    const fetchRelatedProducts = async () => {
-      try {
-        setLoading(true);
-        const response = await getProducts();
-        
-        // Filter products by same category and exclude current product
-        const filtered = response.data.filter(
-          (product) => 
-            product.category._id === categoryId && 
-            product._id !== currentProductId
-        );
-        
-        setRelatedProducts(filtered);
-      } catch (error) {
-        console.error("Failed to fetch related products:", error);
-      } finally {
-        setLoading(false);
-      }
-    };
-
-    fetchRelatedProducts();
-  }, [categoryId, currentProductId]);
+  const { relatedProducts, loading } = useRelatedProducts({ categoryId, currentProductId });
 
   if (loading) {
     return (
