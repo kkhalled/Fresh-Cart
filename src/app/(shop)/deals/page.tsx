@@ -1,9 +1,5 @@
-import React from 'react'
+import DealsScreen from "@/src/features/products/screens/Deals.screen";
 
 export default function DealsPage() {
-  return (
-        <div>
-          <h2>Deals Page</h2>
-        </div>
-    )
-    }
+  return <DealsScreen />;
+}

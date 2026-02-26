@@ -12,9 +12,10 @@ import { Product } from "../types/products.types";
 interface ProductCardProps {
   product: Product;
   priority?: boolean;
+  showDealBadge?: boolean;
 }
 
-const ProductCard = memo(({ product, priority = false }: ProductCardProps) => {
+const ProductCard = memo(({ product, priority = false, showDealBadge = false }: ProductCardProps) => {
   const {
     _id,
     title,
@@ -25,6 +26,10 @@ const ProductCard = memo(({ product, priority = false }: ProductCardProps) => {
     ratingsQuantity,
     category,
   } = product;
+
+  const savings = priceAfterDiscount
+    ? (price - priceAfterDiscount).toFixed(2)
+    : null;
 
   const discountPercentage = priceAfterDiscount
     ? Math.round(((price - priceAfterDiscount) / price) * 100)
@@ -71,7 +76,14 @@ const ProductCard = memo(({ product, priority = false }: ProductCardProps) => {
         {/* Discount Badge */}
         {discountPercentage > 0 && (
           <div className="absolute top-2 left-2 bg-red-500 text-white text-xs font-bold px-2 py-1 rounded">
-            {discountPercentage}%
+            -{discountPercentage}%
+          </div>
+        )}
+
+        {/* Deal savings badge — only shown on Deals page */}
+        {showDealBadge && savings && (
+          <div className="absolute bottom-2 left-2 bg-green-600/90 backdrop-blur-sm text-white text-xs font-semibold px-2.5 py-1 rounded-lg">
+            Save ${savings}
           </div>
         )}
 
