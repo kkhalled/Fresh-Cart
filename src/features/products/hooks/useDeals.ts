@@ -11,6 +11,8 @@ export const DEALS_SORT_OPTIONS: { value: DealsSortOption; label: string }[] = [
   { value: "rating", label: "Top Rated" },
 ];
 
+export const DEALS_PER_PAGE = 10;
+
 function sortDeals(products: Product[], sort: DealsSortOption): Product[] {
   const copy = [...products];
   switch (sort) {
@@ -34,6 +36,7 @@ export function useDeals() {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
   const [sort, setSort] = useState<DealsSortOption>("discount-desc");
+  const [page, setPage] = useState(1);
 
   useEffect(() => {
     async function fetchDeals() {
@@ -51,7 +54,16 @@ export function useDeals() {
     fetchDeals();
   }, []);
 
+  // All deals sorted
   const deals = useMemo(() => sortDeals(products, sort), [products, sort]);
+
+  // Pagination
+ 
+  // Reset to page 1 whenever the sort changes
+  const handleSetSort = (s: DealsSortOption) => {
+    setSort(s);
+    setPage(1);
+  };
 
   const totalSavings = useMemo(
     () => deals.reduce((acc, p) => acc + (p.price - (p.priceAfterDiscount ?? p.price)), 0),
@@ -68,5 +80,17 @@ export function useDeals() {
     return Math.round(sum / deals.length);
   }, [deals]);
 
-  return { deals, loading, error, sort, setSort, totalSavings, avgDiscount };
+  return {
+    deals,
+    
+    loading,
+    error,
+    sort,
+    setSort: handleSetSort,
+    totalSavings,
+    avgDiscount,
+    page,
+    setPage,
+    
+  };
 }

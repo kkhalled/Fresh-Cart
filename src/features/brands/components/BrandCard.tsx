@@ -1,22 +1,23 @@
 "use client";
-import { motion } from "framer-motion";
 import Image from "next/image";
 import Link from "next/link";
 import { Brand } from "../types/brand.type";
+import { useInView } from "@/src/hooks/useInView";
 
 interface BrandCardProps {
   brand: Brand;
 }
 
 export default function BrandCard({ brand }: BrandCardProps) {
+  const { ref, inView } = useInView();
+
   return (
     <Link href={`/brands/${brand._id}`}>
-      <motion.div
-        initial={{ opacity: 0, y: 20 }}
-        whileInView={{ opacity: 1, y: 0 }}
-        viewport={{ once: true }}
-        transition={{ duration: 0.4 }}
-        className="group bg-white rounded-xl border border-gray-200 overflow-hidden hover:shadow-lg hover:border-green-500 transition-all duration-300"
+      <div
+        ref={ref}
+        className={`group bg-white rounded-xl border border-gray-200 overflow-hidden hover:shadow-lg hover:border-green-500 transition-all duration-300 ${
+          inView ? "animate-fade-in-up" : "opacity-0"
+        }`}
       >
         <div className="relative aspect-square bg-gray-50 p-8 flex items-center justify-center">
           <Image
@@ -32,7 +33,7 @@ export default function BrandCard({ brand }: BrandCardProps) {
             {brand.name}
           </h3>
         </div>
-      </motion.div>
+      </div>
     </Link>
   );
 }

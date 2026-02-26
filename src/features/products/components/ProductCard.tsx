@@ -3,8 +3,8 @@
 import { memo } from "react";
 import Image from "next/image";
 import Link from "next/link";
-import { motion } from "framer-motion";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
+import { useInView } from "@/src/hooks/useInView";
 import { faShoppingCart, faStar } from "@fortawesome/free-solid-svg-icons";
 import { faHeart } from "@fortawesome/free-regular-svg-icons";
 import { Product } from "../types/products.types";
@@ -16,6 +16,7 @@ interface ProductCardProps {
 }
 
 const ProductCard = memo(({ product, priority = false, showDealBadge = false }: ProductCardProps) => {
+  const { ref, inView } = useInView();
   const {
     _id,
     title,
@@ -53,16 +54,15 @@ const ProductCard = memo(({ product, priority = false, showDealBadge = false }: 
   };
 
   return (
-    <motion.div
-      initial={{ opacity: 0, y: 10 }}
-      whileInView={{ opacity: 1, y: 0 }}
-      viewport={{ once: true, amount: 0.2 }}
-      transition={{ duration: 0.4, ease: "easeOut" }}
-      className="group bg-white rounded-xl border border-gray-100 overflow-hidden hover:shadow-md transition-all duration-300 flex flex-col h-full w-full"
+    <div
+      ref={ref}
+      className={`group bg-white rounded-xl border border-gray-100 overflow-hidden hover:shadow-md transition-all duration-300 flex flex-col h-full w-full ${
+        inView ? "animate-fade-in-up-sm" : "opacity-0"
+      }`}
     >
       {/* Image Container */}
       <div className="relative aspect-square overflow-hidden bg-gray-50">
-        <Link href={`/products/${_id}`}>
+        <Link href={`/products/${_id}`} className="relative block w-full h-full">
           <Image
             src={imageCover}
             alt={title}
@@ -125,7 +125,7 @@ const ProductCard = memo(({ product, priority = false, showDealBadge = false }: 
             />
           ))}
           <span className="text-xs text-gray-500 ml-1">
-            {ratingsAverage.toFixed(1)} ({ratingsQuantity})
+            {ratingsAverage.toFixed()} ({ratingsQuantity})
           </span>
         </div>
 
@@ -157,7 +157,7 @@ const ProductCard = memo(({ product, priority = false, showDealBadge = false }: 
           </button>
         </div>
       </div>
-    </motion.div>
+    </div>
   );
 });
 

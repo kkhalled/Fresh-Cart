@@ -3,8 +3,8 @@
 import { memo } from "react";
 import Image from "next/image";
 import Link from "next/link";
-import { motion } from "framer-motion";
 import { ApiCategoryItem } from "../types/category.type";
+import { useInView } from "@/src/hooks/useInView";
 
 interface CategoryCardProps {
   category: ApiCategoryItem;
@@ -13,14 +13,13 @@ interface CategoryCardProps {
 
 const CategoryCard = memo(({ category, index = 0 }: CategoryCardProps) => {
   const { _id, name, image } = category;
+  const { ref, inView } = useInView();
 
   return (
-    <motion.div
-      initial={{ opacity: 0, y: 40 }}
-      whileInView={{ opacity: 1, y: 0 }}
-      viewport={{ once: true, amount: 0.2 }}
-      transition={{ duration: 0.4, ease: "easeOut", delay: index * 0.04 }}
-      className="h-full"
+    <div
+      ref={ref}
+      className={`h-full ${inView ? "animate-fade-in-up" : "opacity-0"}`}
+      style={inView ? { animationDelay: `${index * 0.04}s` } : undefined}
     >
       <Link href={`/categories/${_id}`} className="block h-full">
         <div className="group relative h-full rounded-2xl overflow-hidden bg-white/60 backdrop-blur-md border border-gray-200/60 shadow-sm hover:shadow-2xl transition-all duration-500">
@@ -52,7 +51,7 @@ const CategoryCard = memo(({ category, index = 0 }: CategoryCardProps) => {
           </div>
         </div>
       </Link>
-    </motion.div>
+    </div>
   );
 });
 

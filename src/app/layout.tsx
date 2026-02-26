@@ -5,8 +5,6 @@ import "@fortawesome/fontawesome-svg-core/styles";
 import { Exo } from "next/font/google";
 import Providers from "./../providers/providers";
 import { verifyToken } from "../features/auth/server/auth.action";
-import logo from "../assets/mini-logo.png";
-
 const exo = Exo({
   subsets: ["latin"],
   weight: ["400", "500", "600", "700"],
@@ -27,15 +25,19 @@ export default async function RootLayout({
   children: React.ReactNode;
 }>) {
   const verifyTokenResult = await verifyToken();
-  console.log(verifyTokenResult);
 
-  return <>
-    <html lang="en">
-      <body className={` antialiased ${exo.className} font-medium`}>
-        <Providers preloadedState={{ auth: verifyTokenResult }}>
-          {children}
-        </Providers>
-      </body>
-    </html>
-  </>;
+  return (
+    <>
+      <html lang="en">
+        <head>
+          <link rel="preconnect" href="https://fonts.googleapis.com" />
+        </head>
+        <body className={` antialiased ${exo.className} font-medium`}>
+          <Providers preloadedState={{ auth: verifyTokenResult }}>
+            {children}
+          </Providers>
+        </body>
+      </html>
+    </>
+  );
 }

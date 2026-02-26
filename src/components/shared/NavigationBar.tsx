@@ -5,7 +5,7 @@ import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import Link from "next/link";
 import { useState, useEffect } from "react";
 import { usePathname } from "next/navigation";
-import getAllCategories from "@/src/features/categories/server/category.action";
+import { ApiCategoryItem } from "@/src/features/categories/types/category.type";
 
 interface Category {
   _id: string;
@@ -14,38 +14,22 @@ interface Category {
   image: string;
 }
 
-const allowedCategories = ['electronics', "women's-fashion", "men's-fashion", 'beauty-and-health'];
-
 const navigationLinks = [
   { name: 'Home', href: '/' },
   { name: 'Shop', href: '/products' },
   { name: 'Deals', href: '/deals' },
   { name: 'Brands', href: '/brands' },
-  
 ];
 
-export default function NavigationBar() {
+interface NavigationBarProps {
+  initialCategories?: ApiCategoryItem[];
+}
+
+export default function NavigationBar({ initialCategories = [] }: NavigationBarProps) {
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
-  const [categories, setCategories] = useState<Category[]>([]);
+  const categories: Category[] = initialCategories;
   const [isDropdownOpen, setIsDropdownOpen] = useState(false);
   const pathname = usePathname();
-
-  // Fetch categories from API
-  useEffect(() => {
-    const fetchCategories = async () => {
-      try {
-        const response = await getAllCategories();
-        // Filter categories to only show the ones in the image
-        const filtered = response.data.filter((cat) =>
-          allowedCategories.includes(cat.slug)
-        );
-        setCategories(filtered);
-      } catch (error) {
-        console.error('Failed to fetch categories:', error);
-      }
-    };
-    fetchCategories();
-  }, []);
 
   // Close mobile menu when screen size increases
   useEffect(() => {
@@ -181,7 +165,7 @@ export default function NavigationBar() {
                     key={link.name}
                     href={link.href}
                     onClick={() => setIsMobileMenuOpen(false)}
-                    className={`block px-3 py-2.5 rounded-lg text-sm font-medium transition-colors duration-200 ${
+                    className={`block px-4 py-3.5 rounded-lg text-sm font-medium transition-colors duration-200 ${
                       isActiveLink(link.href)
                         ? 'text-green-600 bg-green-50'
                         : 'text-gray-700 hover:text-green-600 hover:bg-green-50'
@@ -201,7 +185,7 @@ export default function NavigationBar() {
                   <Link
                     href="/categories"
                     onClick={() => setIsMobileMenuOpen(false)}
-                    className="block px-3 py-2.5 text-gray-700 hover:text-green-600 hover:bg-green-50 rounded-lg transition-colors duration-200"
+                    className="block px-4 py-3.5 text-gray-700 hover:text-green-600 hover:bg-green-50 rounded-lg transition-colors duration-200"
                   >
                     <span className="text-sm font-medium">All Categories</span>
                   </Link>
@@ -210,7 +194,7 @@ export default function NavigationBar() {
                       key={category._id}
                       href={`/categories/${category._id}`}
                       onClick={() => setIsMobileMenuOpen(false)}
-                      className="block px-3 py-2.5 text-gray-700 hover:text-green-600 hover:bg-green-50 rounded-lg transition-colors duration-200"
+                      className="block px-4 py-3.5 text-gray-700 hover:text-green-600 hover:bg-green-50 rounded-lg transition-colors duration-200"
                     >
                       <span className="text-sm font-medium">{category.name}</span>
                     </Link>

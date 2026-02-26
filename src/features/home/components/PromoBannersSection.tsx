@@ -42,13 +42,11 @@ export default function PromoBannersSection() {
       <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
         <PromoBannerCard
           {...promoBanners[0]}
-          initial={{ opacity: 0, x: -80 }}
-          animate={{ opacity: 1, x: 0 }}
+          animationClass="animate-slide-in-left"
         />
         <PromoBannerCard
           {...promoBanners[1]}
-          initial={{ opacity: 0, x: 80 }}
-          animate={{ opacity: 1, x: 0 }}
+          animationClass="animate-slide-in-right"
         />
       </div>
     </section>

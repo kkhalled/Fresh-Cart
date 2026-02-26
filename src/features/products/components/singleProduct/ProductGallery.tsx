@@ -1,7 +1,14 @@
 "use client";
 
-import ImageGallery from "react-image-gallery";
+import dynamic from "next/dynamic";
 import "react-image-gallery/styles/image-gallery.css";
+
+const ImageGallery = dynamic(() => import("react-image-gallery"), {
+  ssr: false,
+  loading: () => (
+    <div className="aspect-square bg-gray-100 animate-pulse rounded-xl" />
+  ),
+});
 
 interface ProductGalleryProps {
   images: string[];

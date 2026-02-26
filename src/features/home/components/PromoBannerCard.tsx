@@ -1,6 +1,6 @@
 "use client";
 
-import { motion } from "framer-motion";
+import { useInView } from "@/src/hooks/useInView";
 
 export interface PromoBannerCardProps {
   gradientFrom: string;
@@ -10,8 +10,7 @@ export interface PromoBannerCardProps {
   description: string;
   buttonText: string;
   buttonHref: string;
-  initial: { opacity: number; x: number };
-  animate: { opacity: number; x: number };
+  animationClass?: string;
 }
 
 export default function PromoBannerCard({
@@ -22,16 +21,16 @@ export default function PromoBannerCard({
   description,
   buttonText,
   buttonHref,
-  initial,
-  animate,
+  animationClass = "animate-fade-in-up",
 }: PromoBannerCardProps) {
+  const { ref, inView } = useInView({ threshold: 0.2 });
+
   return (
-    <motion.div
-      initial={initial}
-      whileInView={animate}
-      viewport={{ once: true, amount: 0.3 }}
-      transition={{ duration: 0.6, ease: "easeOut" }}
-      className="relative overflow-hidden rounded-2xl group h-64 md:h-72"
+    <div
+      ref={ref}
+      className={`relative overflow-hidden rounded-2xl group h-64 md:h-72 ${
+        inView ? animationClass : "opacity-0"
+      }`}
     >
       <div 
         className={`absolute inset-0 bg-linear-to-br ${gradientFrom} ${gradientTo} transition-transform duration-500 group-hover:scale-105`}
@@ -52,6 +51,6 @@ export default function PromoBannerCard({
           </a>
         </div>
       </div>
-    </motion.div>
+    </div>
   );
 }
