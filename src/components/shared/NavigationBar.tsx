@@ -29,7 +29,18 @@ export default function NavigationBar({ initialCategories = [] }: NavigationBarP
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
   const categories: Category[] = initialCategories;
   const [isDropdownOpen, setIsDropdownOpen] = useState(false);
+  const [isAtTop, setIsAtTop] = useState(true);
   const pathname = usePathname();
+
+  useEffect(() => {
+    let rafId: number;
+    const handleScroll = () => {
+      cancelAnimationFrame(rafId);
+      rafId = requestAnimationFrame(() => setIsAtTop(window.scrollY < 10));
+    };
+    window.addEventListener("scroll", handleScroll, { passive: true });
+    return () => { window.removeEventListener("scroll", handleScroll); cancelAnimationFrame(rafId); };
+  }, []);
 
   // Close mobile menu when screen size increases
   useEffect(() => {
@@ -61,7 +72,7 @@ export default function NavigationBar({ initialCategories = [] }: NavigationBarP
   return (
     <>
       {/* Navigation Menu */}
-      <div className="bg-gray-50 border-[.10px] border-gray-50">
+      <div className={`bg-gray-50 border-[.10px] border-gray-50 transition-all duration-300 ease-in-out overflow-hidden ${isAtTop ? "max-h-20 opacity-100" : "max-h-0 opacity-0"}`}>
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="flex items-center justify-between h-14">
             {/* Desktop Navigation */}

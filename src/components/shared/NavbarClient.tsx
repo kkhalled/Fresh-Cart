@@ -102,7 +102,7 @@ export default function NavbarClient({ topBar }: NavbarClientProps) {
       </div>
 
       {/* ── MAIN HEADER ───────────────────────────────────────────────────────── */}
-      <div className="bg-white border-b border-gray-100">
+      <div className={`sticky top-0 z-50 bg-white transition-shadow duration-300 ${!isAtTop ? "shadow-md border-b border-gray-100" : "border-b border-gray-100"}`}>
         <div className="max-w-7xl mx-auto px-4 md:px-6">
           <div className="relative flex items-center justify-between h-16">
 
