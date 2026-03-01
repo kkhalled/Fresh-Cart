@@ -108,7 +108,7 @@ export default function ProductsScreen() {
 
       {/* Mobile Filter Drawer */}
       {isMobileFilterOpen && (
-        <div className="lg:hidden fixed inset-0 z-50 flex">
+        <div className="lg:hidden fixed inset-x-0 top-0 h-dvh z-50 flex">
           {/* Backdrop */}
           <div
             className="absolute inset-0 bg-black/40 backdrop-blur-sm"
