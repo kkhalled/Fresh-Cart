@@ -1,4 +1,3 @@
-import { SpeedInsights } from "@vercel/speed-insights/next"
 import type { Metadata } from "next";
 import "../styles/globals.css";
 import "@fortawesome/fontawesome-svg-core/styles.css";
