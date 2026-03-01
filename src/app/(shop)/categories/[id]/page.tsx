@@ -1,11 +1,15 @@
-import React from 'react'
 
-export default function SpecificCategoryPage() {
-  return <>
-  
+import CategoryDetailScreen from "@/src/features/categories/screens/CategoryDetail.screen";
 
-  <h2>Specific Category Page</h2>
-  
-   
-  </>
+interface CategoryPageProps {
+  params: {
+    id: string;
+  };
+}
+
+
+
+export default async  function SpecificCategoryPage({ params }: CategoryPageProps) {
+  const { id } = await params;
+  return <CategoryDetailScreen categoryId={id} />;
 }

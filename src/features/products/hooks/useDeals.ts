@@ -58,7 +58,13 @@ export function useDeals() {
   const deals = useMemo(() => sortDeals(products, sort), [products, sort]);
 
   // Pagination
- 
+  const totalPages = Math.max(1, Math.ceil(deals.length / DEALS_PER_PAGE));
+
+  const pageDeals = useMemo(() => {
+    const start = (page - 1) * DEALS_PER_PAGE;
+    return deals.slice(start, start + DEALS_PER_PAGE);
+  }, [deals, page]);
+
   // Reset to page 1 whenever the sort changes
   const handleSetSort = (s: DealsSortOption) => {
     setSort(s);
@@ -82,7 +88,7 @@ export function useDeals() {
 
   return {
     deals,
-    
+    pageDeals,
     loading,
     error,
     sort,
@@ -91,6 +97,6 @@ export function useDeals() {
     avgDiscount,
     page,
     setPage,
-    
+    totalPages,
   };
 }

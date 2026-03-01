@@ -1,6 +1,12 @@
 import { type IconDefinition } from "@fortawesome/free-solid-svg-icons";
 
-// API Response Types
+/* ═══════════════════════════════════════════════════════════════════════════
+   category.type.ts
+   TypeScript interfaces for Categories & Subcategories feature.
+   ═══════════════════════════════════════════════════════════════════════════ */
+
+/* ─── Category Types ────────────────────────────────────────────────────── */
+
 export interface ApiCategoryItem {
   _id: string;
   name: string;
@@ -10,7 +16,7 @@ export interface ApiCategoryItem {
   updatedAt: string;
 }
 
-export  interface CategoryProps {
+export interface CategoryProps {
   _id: string;
   name: string;
   slug: string;
@@ -29,12 +35,37 @@ export interface CategoriesResponse {
   data: ApiCategoryItem[];
 }
 
-// Type for the categories array (data.data)
+export interface CategoryDetailResponse {
+  data: ApiCategoryItem;
+}
+
+/* ─── Subcategory Types ─────────────────────────────────────────────────── */
+
+export interface ApiSubcategoryItem {
+  _id: string;
+  name: string;
+  slug: string;
+  category: string; // parent category ID
+  createdAt?: string;
+  updatedAt?: string;
+}
+
+export interface SubcategoriesResponse {
+  results: number;
+  data: ApiSubcategoryItem[];
+}
+
+/* ─── Redux State Shape ─────────────────────────────────────────────────── */
+
+export interface CategoryState {
+  selectedCategory: ApiCategoryItem | null;
+  subcategories: ApiSubcategoryItem[];
+  loading: boolean;
+  error: string | null;
+}
+
+/* ─── Utility Types ─────────────────────────────────────────────────────── */
+
 export type CategoriesArray = ApiCategoryItem[];
+export type SubcategoriesArray = ApiSubcategoryItem[];
 
-// Frontend Component Types
-
-
-
-
-// Utility Types

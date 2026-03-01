@@ -4,7 +4,7 @@ import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faChevronRight } from "@fortawesome/free-solid-svg-icons";
-import { useMemo, useEffect, useState } from "react";
+import { useMemo, useEffect, useState, useRef } from "react";
 import getAllCategories from "@/src/features/categories/server/category.action";
 import { ApiCategoryItem } from "@/src/features/categories/types/category.type";
 import { getProductsDetails } from "@/src/features/products/server/products.action";
@@ -15,43 +15,61 @@ interface BreadcrumbItem {
   href: string;
 }
 
+// Module-level cache so categories are only fetched once per session
+let categoriesCache: ApiCategoryItem[] | null = null;
+
 export default function Breadcrumb() {
   const pathname = usePathname();
-  const [categories, setCategories] = useState<ApiCategoryItem[]>([]);
+  const [categories, setCategories] = useState<ApiCategoryItem[]>(categoriesCache ?? []);
   const [product, setProduct] = useState<ProductDetailsResponse | null>(null);
+  const prevProductId = useRef<string | null>(null);
 
-  // Fetch categories for dynamic breadcrumb labels
+  // Only fetch categories when on a page that actually needs them (categories pages)
+  const needsCategories = pathname.startsWith("/categories/");
   useEffect(() => {
+    if (!needsCategories || categoriesCache) return;
+    let cancelled = false;
     const fetchCategories = async () => {
       try {
         const response = await getAllCategories();
-        setCategories(response.data);
+        if (!cancelled) {
+          categoriesCache = response.data;
+          setCategories(response.data);
+        }
       } catch (error) {
         console.error("Failed to fetch categories:", error);
       }
     };
     fetchCategories();
-  }, []);
+    return () => { cancelled = true; };
+  }, [needsCategories]);
 
-  // Fetch product details if on a product page
+  // Fetch product details only when on a product page and only when the ID changes
   useEffect(() => {
+    const productMatch = pathname.match(/^\/products\/([^\/]+)$/);
+    const productId = productMatch?.[1] ?? null;
+
+    // Skip if same product ID as last time
+    if (productId === prevProductId.current) return;
+    prevProductId.current = productId;
+
+    if (!productId) {
+      setProduct(null);
+      return;
+    }
+
+    let cancelled = false;
     const fetchProduct = async () => {
-      // Check if we're on a product details page (pattern: /products/{id})
-      const productMatch = pathname.match(/^\/products\/([^\/]+)$/);
-      if (productMatch) {
-        const productId = productMatch[1];
-        try {
-          const productData = await getProductsDetails(productId);
-          setProduct(productData);
-        } catch (error) {
-          console.error("Failed to fetch product details:", error);
-          setProduct(null);
-        }
-      } else {
-        setProduct(null);
+      try {
+        const productData = await getProductsDetails(productId);
+        if (!cancelled) setProduct(productData);
+      } catch (error) {
+        console.error("Failed to fetch product details:", error);
+        if (!cancelled) setProduct(null);
       }
     };
     fetchProduct();
+    return () => { cancelled = true; };
   }, [pathname]);
 
   const breadcrumbs = useMemo(() => {
@@ -83,7 +101,6 @@ export default function Breadcrumb() {
         "/brands": "Brands",
         "/categories": "Categories",
         "/deals": "Deals",
-        "/search": "Search Results",
         "/products/": "Product Details",
       };
 

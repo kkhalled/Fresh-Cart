@@ -1,6 +1,6 @@
 ﻿"use client";
 
-import { useEffect, useMemo, useState } from "react";
+import { useMemo } from "react";
 import Link from "next/link";
 import { Swiper, SwiperSlide } from "swiper/react";
 import { Navigation, Pagination } from "swiper/modules";
@@ -11,43 +11,12 @@ import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faArrowRight, faChevronLeft, faChevronRight } from "@fortawesome/free-solid-svg-icons";
 import { Product } from "../../products/types/products.types";
 import ProductCard from "../../products/components/ProductCard";
-import { getProducts } from "../../products/server/products.action";
 
-const PopularProductsSkeleton = () => (
-  <section className="w-full max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
-    <div className="flex items-center justify-between gap-4 mb-6">
-      <div>
-        <div className="h-6 w-40 bg-gray-200 rounded animate-pulse mb-2" />
-        <div className="h-3 w-48 bg-gray-200 rounded animate-pulse" />
-      </div>
-      <div className="h-8 w-32 bg-gray-200 rounded animate-pulse" />
-    </div>
-    <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-6 gap-4">
-      {[...Array(6)].map((_, i) => (
-        <div key={i} className="bg-white rounded-xl overflow-hidden shadow-sm">
-          <div className="aspect-square bg-gray-200 animate-pulse" />
-          <div className="p-3 space-y-2">
-            <div className="h-3 bg-gray-200 rounded animate-pulse" />
-            <div className="h-3 w-3/4 bg-gray-200 rounded animate-pulse" />
-            <div className="h-8 bg-gray-200 rounded animate-pulse" />
-          </div>
-        </div>
-      ))}
-    </div>
-  </section>
-);
+interface PopularProductsSectionProps {
+  products: Product[];
+}
 
-export default function PopularProductsSection() {
-  const [products, setProducts] = useState<Product[]>([]);
-  const [loading, setLoading] = useState(true);
-
-  useEffect(() => {
-    getProducts()
-      .then((res) => setProducts(res.data))
-      .catch(() => {})
-      .finally(() => setLoading(false));
-  }, []);
-
+export default function PopularProductsSection({ products }: PopularProductsSectionProps) {
   const popularProducts = useMemo(
     () =>
       products
@@ -55,11 +24,11 @@ export default function PopularProductsSection() {
         .sort((a, b) => {
           if (b.ratingsAverage !== a.ratingsAverage) return b.ratingsAverage - a.ratingsAverage;
           return b.ratingsQuantity - a.ratingsQuantity;
-        }),
+        })
+        .slice(0, 18),
     [products]
   );
 
-  if (loading) return <PopularProductsSkeleton />;
   if (popularProducts.length === 0) return null;
 
   return (

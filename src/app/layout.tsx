@@ -1,7 +1,6 @@
 import type { Metadata } from "next";
-import { Geist, Geist_Mono } from "next/font/google";
 import "../styles/globals.css";
-import "@fortawesome/fontawesome-svg-core/styles";
+import "@fortawesome/fontawesome-svg-core/styles.css";
 import { Exo } from "next/font/google";
 import Providers from "./../providers/providers";
 import { verifyToken } from "../features/auth/server/auth.action";
@@ -29,9 +28,6 @@ export default async function RootLayout({
   return (
     <>
       <html lang="en">
-        <head>
-          <link rel="preconnect" href="https://fonts.googleapis.com" />
-        </head>
         <body className={` antialiased ${exo.className} font-medium`}>
           <Providers preloadedState={{ auth: verifyTokenResult }}>
             {children}

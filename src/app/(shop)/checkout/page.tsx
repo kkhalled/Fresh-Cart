@@ -1,6 +1,6 @@
-import React from "react";
+import CheckoutScreen from "@/src/features/checkout/screens/Checkout.screen";
 
 export default function CheckoutPage() {
-  return <div></div>;
+  return <CheckoutScreen />;
 }
 

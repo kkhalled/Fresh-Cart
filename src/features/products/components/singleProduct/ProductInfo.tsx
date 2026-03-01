@@ -8,10 +8,20 @@ import {
   faPlus,
   faCartShopping,
   faShareNodes,
+  faBolt,
 } from "@fortawesome/free-solid-svg-icons";
-import { faHeart } from "@fortawesome/free-regular-svg-icons";
+import { faHeart as faHeartRegular } from "@fortawesome/free-regular-svg-icons";
+import { faHeart as faHeartSolid } from "@fortawesome/free-solid-svg-icons";
 import { ProductDetailsResponse } from "../../types/products.types";
-import { useState } from "react";
+import { useState, useCallback } from "react";
+import { useRouter } from "next/navigation";
+import { toast } from "react-toastify";
+import { useAppDispatch, useAppSelector } from "@/src/store/store";
+import { addToCartThunk, updateQuantityThunk } from "../../../cart/store/cart.thunks";
+import { setGuestCartItems } from "../../../cart/store/cart.slice";
+import { addGuestCartItem } from "../../../cart/utils/guestCart.storage";
+import { mapGuestCartToItems } from "../../../cart/utils/cart.mapper";
+import { useProductCardActions } from "../../hooks/useProductCardActions";
 
 export default function ProductInfo({
   product,
@@ -28,20 +38,60 @@ export default function ProductInfo({
     : 0;
 
   const [quantity, setQuantity] = useState(1);
-  
+  const router = useRouter();
+  const dispatch = useAppDispatch();
+  const isAuthenticated = useAppSelector((s) => s.auth.isAuthenticated);
+  const isAddPending = useAppSelector((s) => !!s.cart.pendingActions[data._id]);
+
+  const {
+    toggleWishlist,
+    isInWishlist: isInWishlistState,
+    isWishlistPending,
+  } = useProductCardActions(data._id);
+
   // Calculate prices
   const unitPrice = hasSale ? data.priceAfterDiscount! : data.price;
   const totalPrice = (unitPrice * quantity).toFixed(2);
   const originalTotalPrice = hasSale ? (data.price * quantity).toFixed(2) : null;
 
-  // Quantity handlers
-  const handleDecrement = () => {
-    setQuantity((prev) => Math.max(prev - 1, 1));
-  };
+  const handleDecrement = () => setQuantity((prev) => Math.max(prev - 1, 1));
+  const handleIncrement = () => setQuantity((prev) => Math.min(prev + 1, data.quantity));
+  const handleWishlistToggle = () => toggleWishlist();
 
-  const handleIncrement = () => {
-    setQuantity((prev) => Math.min(prev + 1, data.quantity));
-  };
+  const handleAddToCart = useCallback(async () => {
+    if (!isInStock || isAddPending) return;
+    if (isAuthenticated) {
+      try {
+        await dispatch(addToCartThunk(data._id)).unwrap();
+        if (quantity > 1) {
+          await dispatch(updateQuantityThunk({ productId: data._id, count: quantity })).unwrap();
+        }
+        toast.success(`Added${quantity > 1 ? ` ×${quantity}` : ''} to cart`);
+      } catch {
+        toast.error('Failed to add to cart');
+      }
+    } else {
+      const newCart = addGuestCartItem({
+        productId: data._id,
+        quantity,
+        title: data.title,
+        imageCover: data.imageCover,
+        category: data.category.name,
+        price: unitPrice,
+        ratingsAverage: data.ratingsAverage,
+        ratingsQuantity: data.ratingsQuantity,
+      });
+      const items = mapGuestCartToItems(newCart);
+      const total = items.reduce((acc, i) => acc + i.price * i.quantity, 0);
+      dispatch(setGuestCartItems({ items, total }));
+      toast.success(`Added${quantity > 1 ? ` ×${quantity}` : ''} to cart`);
+    }
+  }, [isInStock, isAddPending, isAuthenticated, dispatch, data, quantity, unitPrice]);
+
+  const handleBuyNow = useCallback(async () => {
+    await handleAddToCart();
+    router.push('/cart');
+  }, [handleAddToCart, router]);
   return (
     <div className="rounded-xl border border-gray-200 bg-white p-8 shadow-sm">
       {/* 1. Stock Badge and Icons Row */}
@@ -65,8 +115,17 @@ export default function ProductInfo({
           <button className="text-gray-600 hover:text-green-600">
             <FontAwesomeIcon icon={faShareNodes} className="h-5 w-5" />
           </button>
-          <button className="text-gray-600 hover:text-red-500">
-            <FontAwesomeIcon icon={faHeart} className="h-5 w-5" />
+          <button
+            onClick={handleWishlistToggle}
+            disabled={isWishlistPending}
+            className={`text-gray-600 hover:text-red-500 disabled:opacity-50 disabled:cursor-not-allowed ${
+              isInWishlistState ? "text-red-500" : ""
+            }`}
+          >
+            <FontAwesomeIcon
+              icon={isInWishlistState ? faHeartSolid : faHeartRegular}
+              className="h-5 w-5"
+            />
           </button>
         </div>
       </div>
@@ -146,7 +205,7 @@ export default function ProductInfo({
         </div>
         
         {/* Total Price Display */}
-        <div className="rounded-lg bg-gradient-to-r from-green-50 to-emerald-50 border-2 border-green-200 p-4">
+        <div className="rounded-lg bg-linear-to-r from-green-50 to-emerald-50 border-2 border-green-200 p-4">
           <div className="flex items-center justify-between">
             <div>
               <p className="text-sm text-gray-600 mb-1">Total Price</p>
@@ -225,7 +284,7 @@ export default function ProductInfo({
               >
                 <FontAwesomeIcon icon={faMinus} className="h-4 w-4" />
               </button>
-              <span className="w-16 text-center text-lg font-bold text-gray-900 border-x-1 border-gray-300 py-3">
+              <span className="w-16 text-center text-lg font-bold text-gray-900 border-x border-gray-300 py-3">
                 {quantity}
               </span>
               <button
@@ -254,24 +313,34 @@ export default function ProductInfo({
       {/* 8. Action Buttons */}
       <div className="mb-6 grid grid-cols-2 gap-4">
         <button
-          disabled={!isInStock}
+          onClick={handleAddToCart}
+          disabled={!isInStock || isAddPending}
           className={`flex items-center justify-center gap-2 rounded-lg py-3 text-base font-medium transition-colors ${
-            isInStock
+            isInStock && !isAddPending
               ? "bg-green-600 text-white hover:bg-green-700"
               : "bg-gray-300 text-gray-500 cursor-not-allowed"
           }`}
         >
-          <FontAwesomeIcon icon={faCartShopping} className="h-4 w-4" />
-          {isInStock ? "Add to Cart" : "Out of Stock"}
+          {isAddPending ? (
+            <svg className="w-4 h-4 animate-spin" viewBox="0 0 24 24" fill="none" aria-hidden="true">
+              <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4" />
+              <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4z" />
+            </svg>
+          ) : (
+            <FontAwesomeIcon icon={faCartShopping} className="h-4 w-4" />
+          )}
+          {isInStock ? (isAddPending ? "Adding..." : "Add to Cart") : "Out of Stock"}
         </button>
         <button
-          disabled={!isInStock}
-          className={`rounded-lg py-3 text-base font-medium transition-colors ${
-            isInStock
-              ? "border border-gray-300 text-gray-800 hover:bg-gray-50"
+          onClick={handleBuyNow}
+          disabled={!isInStock || isAddPending}
+          className={`flex items-center justify-center gap-2 rounded-lg py-3 text-base font-medium transition-colors ${
+            isInStock && !isAddPending
+              ? "border-2 border-green-600 text-green-700 hover:bg-green-50"
               : "border border-gray-300 bg-gray-100 text-gray-500 cursor-not-allowed"
           }`}
         >
+          <FontAwesomeIcon icon={faBolt} className="h-4 w-4" />
           Buy Now
         </button>
       </div>

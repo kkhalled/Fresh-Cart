@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useState, useEffect, ReactNode } from "react";
+import React, { useState, useEffect, useCallback, ReactNode } from "react";
 import dynamic from "next/dynamic";
 import Image from "next/image";
 import Link from "next/link";
@@ -18,6 +18,7 @@ import { useSelector } from "react-redux";
 import { toast } from "react-toastify";
 import { AppState } from "@/src/store/store";
 import useLogout from "@/src/hooks/useLogout";
+import { useCartCount } from "@/src/features/cart/hooks/useCartCount";
 import logo from "../../assets/freshcart-logo.svg";
 
 // Lazy-load the mobile drawer — only downloaded when the user opens it
@@ -39,7 +40,7 @@ export default function NavbarClient({ topBar }: NavbarClientProps) {
   const isAuthenticated = useSelector(
     (state: AppState) => state.auth.isAuthenticated
   );
-  const cartItemsCount = 3;
+  const cartItemsCount = useCartCount();
 
   const { logout } = useLogout();
 
@@ -82,13 +83,13 @@ export default function NavbarClient({ topBar }: NavbarClientProps) {
     // TODO: wire up search navigation
   };
 
-  const handleLogout = () => {
+  const handleLogout = useCallback(() => {
     setIsMobileMenuOpen(false);
     logout();
     toast.success("Logged out successfully", { autoClose: 1000 });
-  };
+  }, [logout]);
 
-  const closeMobileMenu = () => setIsMobileMenuOpen(false);
+  const closeMobileMenu = useCallback(() => setIsMobileMenuOpen(false), []);
 
   return (
     <>

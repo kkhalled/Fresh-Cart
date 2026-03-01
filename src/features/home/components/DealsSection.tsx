@@ -1,6 +1,6 @@
 ﻿"use client";
 
-import { useEffect, useMemo, useState } from "react";
+import { useMemo, useState, useEffect, useCallback } from "react";
 import Link from "next/link";
 import { Swiper, SwiperSlide } from "swiper/react";
 import { Navigation, Pagination } from "swiper/modules";
@@ -11,44 +11,55 @@ import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faArrowRight, faChevronLeft, faChevronRight } from "@fortawesome/free-solid-svg-icons";
 import { Product } from "../../products/types/products.types";
 import ProductCard from "../../products/components/ProductCard";
-import { getProducts } from "../../products/server/products.action";
 
 interface ProductWithDiscount extends Product { discountPercentage: number; }
 
-const DealsSkeleton = () => (
-  <section className="w-full max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
-    <div className="flex items-center justify-between gap-4 mb-6">
-      <div>
-        <div className="h-6 w-40 bg-gray-200 rounded animate-pulse mb-2" />
-        <div className="h-3 w-32 bg-gray-200 rounded animate-pulse" />
-      </div>
-      <div className="h-8 w-32 bg-gray-200 rounded animate-pulse" />
-    </div>
-    <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-6 gap-4">
-      {[...Array(6)].map((_, i) => (
-        <div key={i} className="bg-white rounded-xl overflow-hidden shadow-sm">
-          <div className="aspect-square bg-gray-200 animate-pulse" />
-          <div className="p-3 space-y-2">
-            <div className="h-3 bg-gray-200 rounded animate-pulse" />
-            <div className="h-3 w-3/4 bg-gray-200 rounded animate-pulse" />
-            <div className="h-8 bg-gray-200 rounded animate-pulse" />
-          </div>
-        </div>
-      ))}
-    </div>
-  </section>
-);
+interface DealsSectionProps {
+  products: Product[];
+}
 
-export default function DealsSection() {
-  const [products, setProducts] = useState<Product[]>([]);
-  const [loading, setLoading] = useState(true);
+/** Returns ms until midnight in the user's local timezone. */
+function getMsUntilMidnight() {
+  const now = new Date();
+  const midnight = new Date(now);
+  midnight.setHours(24, 0, 0, 0);
+  return midnight.getTime() - now.getTime();
+}
+
+function formatTime(ms: number) {
+  const totalSec = Math.max(0, Math.floor(ms / 1000));
+  const h = String(Math.floor(totalSec / 3600)).padStart(2, "0");
+  const m = String(Math.floor((totalSec % 3600) / 60)).padStart(2, "0");
+  const s = String(totalSec % 60).padStart(2, "0");
+  return { h, m, s };
+}
+
+function useCountdown() {
+  const [remaining, setRemaining] = useState(getMsUntilMidnight);
 
   useEffect(() => {
-    getProducts()
-      .then((res) => setProducts(res.data))
-      .catch(() => {})
-      .finally(() => setLoading(false));
+    const id = setInterval(() => {
+      setRemaining(getMsUntilMidnight());
+    }, 1000);
+    return () => clearInterval(id);
   }, []);
+
+  return formatTime(remaining);
+}
+
+function TimerBadge({ value, label }: { value: string; label: string }) {
+  return (
+    <div className="flex flex-col items-center">
+      <span className="bg-gray-900 text-white text-xs sm:text-sm font-bold font-mono rounded-md px-1.5 py-0.5 min-w-7 text-center leading-snug">
+        {value}
+      </span>
+      <span className="text-[9px] text-gray-400 mt-0.5">{label}</span>
+    </div>
+  );
+}
+
+export default function DealsSection({ products }: DealsSectionProps) {
+  const { h, m, s } = useCountdown();
 
   const dealProducts = useMemo(() => {
     return (products
@@ -59,10 +70,9 @@ export default function DealsSection() {
           ((p.price - (p.priceAfterDiscount || 0)) / p.price) * 100
         ),
       })) as ProductWithDiscount[]
-    ).sort((a, b) => b.discountPercentage - a.discountPercentage);
+    ).sort((a, b) => b.discountPercentage - a.discountPercentage).slice(0, 10);
   }, [products]);
 
-  if (loading) return <DealsSkeleton />;
   if (dealProducts.length === 0) return null;
 
   return (
@@ -70,9 +80,16 @@ export default function DealsSection() {
       <div className="flex items-center justify-between gap-4 mb-6">
         <div>
           <h2 className="text-xl md:text-2xl font-bold text-gray-900 mb-1">Deals of the Day</h2>
-          <p className="text-xs text-gray-500">
-            Offers end in: <span className="font-mono text-red-600 font-semibold">23:12:15</span>
-          </p>
+          <div className="flex items-center gap-1.5 mt-1">
+            <span className="text-xs text-gray-500">Ends in:</span>
+            <div className="flex items-center gap-1">
+              <TimerBadge value={h} label="hrs" />
+              <span className="text-gray-400 font-bold text-xs leading-none mb-3">:</span>
+              <TimerBadge value={m} label="min" />
+              <span className="text-gray-400 font-bold text-xs leading-none mb-3">:</span>
+              <TimerBadge value={s} label="sec" />
+            </div>
+          </div>
         </div>
         <div className="flex items-center gap-3">
           <div className="flex items-center gap-1">

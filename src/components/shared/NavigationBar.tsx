@@ -1,6 +1,6 @@
 'use client';
 
-import { faChevronDown, faBars, faTimes } from "@fortawesome/free-solid-svg-icons";
+import { faChevronDown } from "@fortawesome/free-solid-svg-icons";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import Link from "next/link";
 import { useState, useEffect } from "react";
@@ -19,6 +19,7 @@ const navigationLinks = [
   { name: 'Shop', href: '/products' },
   { name: 'Deals', href: '/deals' },
   { name: 'Brands', href: '/brands' },
+  { name: 'Orders', href: '/orders' },
 ];
 
 interface NavigationBarProps {
@@ -26,7 +27,6 @@ interface NavigationBarProps {
 }
 
 export default function NavigationBar({ initialCategories = [] }: NavigationBarProps) {
-  const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
   const categories: Category[] = initialCategories;
   const [isDropdownOpen, setIsDropdownOpen] = useState(false);
   const [isAtTop, setIsAtTop] = useState(true);
@@ -36,34 +36,15 @@ export default function NavigationBar({ initialCategories = [] }: NavigationBarP
     let rafId: number;
     const handleScroll = () => {
       cancelAnimationFrame(rafId);
-      rafId = requestAnimationFrame(() => setIsAtTop(window.scrollY < 10));
+      rafId = requestAnimationFrame(() => {
+        const atTop = window.scrollY < 10;
+        setIsAtTop(atTop);
+        if (!atTop) setIsDropdownOpen(false);
+      });
     };
     window.addEventListener("scroll", handleScroll, { passive: true });
     return () => { window.removeEventListener("scroll", handleScroll); cancelAnimationFrame(rafId); };
   }, []);
-
-  // Close mobile menu when screen size increases
-  useEffect(() => {
-    const handleResize = () => {
-      if (window.innerWidth >= 768 && isMobileMenuOpen) {
-        setIsMobileMenuOpen(false);
-      }
-    };
-    window.addEventListener('resize', handleResize);
-    return () => window.removeEventListener('resize', handleResize);
-  }, [isMobileMenuOpen]);
-
-  // Prevent body scroll when mobile menu is open
-  useEffect(() => {
-    if (isMobileMenuOpen) {
-      document.body.style.overflow = 'hidden';
-    } else {
-      document.body.style.overflow = 'unset';
-    }
-    return () => {
-      document.body.style.overflow = 'unset';
-    };
-  }, [isMobileMenuOpen]);
 
   const isActiveLink = (href: string) => {
     if (href === '/') return pathname === '/';
@@ -72,7 +53,7 @@ export default function NavigationBar({ initialCategories = [] }: NavigationBarP
   return (
     <>
       {/* Navigation Menu */}
-      <div className={`bg-gray-50 border-[.10px] border-gray-50 transition-all duration-300 ease-in-out overflow-hidden ${isAtTop ? "max-h-20 opacity-100" : "max-h-0 opacity-0"}`}>
+      <div className={`bg-gray-50 border-[.10px] border-gray-50 transition-all duration-300 ease-in-out ${isDropdownOpen ? "" : "overflow-hidden"} ${isAtTop ? "max-h-20 opacity-100" : "max-h-0 opacity-0"}`}>
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="flex items-center justify-between h-14">
             {/* Desktop Navigation */}
@@ -106,7 +87,7 @@ export default function NavigationBar({ initialCategories = [] }: NavigationBarP
 
               {/* Dropdown Menu */}
               {isDropdownOpen && (
-                <div className="absolute top-full left-0  w-56 bg-white border border-gray-200 rounded-xl shadow-xl z-100">
+                <div className="absolute top-full left-0 w-56 bg-white border border-gray-200 rounded-xl shadow-xl z-50">
                   <div className="py-2">
                     <Link
                       href="/categories"
@@ -117,7 +98,7 @@ export default function NavigationBar({ initialCategories = [] }: NavigationBarP
                     {categories.map((category) => (
                       <Link
                         key={category._id}
-                        href={`/categories/${category.slug}`}
+                        href={`/categories/${category._id}`}
                         className="block px-5 py-3 text-gray-700 hover:text-green-600 hover:bg-green-50 transition-colors duration-200"
                       >
                         <span className="text-sm font-medium">{category.name}</span>
@@ -146,74 +127,33 @@ export default function NavigationBar({ initialCategories = [] }: NavigationBarP
             </nav>
             </div>
 
-            {/* Mobile Menu Button */}
-            <div className="md:hidden flex items-center justify-between w-full">
-              <button
-                onClick={() => setIsMobileMenuOpen(!isMobileMenuOpen)}
-                className="flex items-center gap-2 text-gray-700 hover:text-green-600 transition-colors duration-200"
-                aria-label="Toggle navigation menu"
-              >
-                <FontAwesomeIcon icon={isMobileMenuOpen ? faTimes : faBars} className="text-lg" />
-                <span className="font-medium text-sm">Menu</span>
-              </button>
-              
-              {/* Mobile Categories Button */}
+            {/* Mobile Navigation — horizontal scrollable strip */}
+            <div className="md:hidden flex items-center w-full overflow-x-auto scrollbar-hide gap-2 py-0.5 -mx-1 px-1">
               <Link
                 href="/categories"
-                className="bg-green-600 text-white px-3 py-2 rounded-lg text-sm font-medium hover:bg-green-700 transition-colors duration-200"
+                className="shrink-0 bg-green-600 text-white px-3 py-1.5 rounded-full text-xs font-semibold hover:bg-green-700 transition-colors duration-200 flex items-center gap-1.5"
               >
+                <svg className="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 6h16M4 12h16M4 18h16" />
+                </svg>
                 Categories
               </Link>
+              {navigationLinks.map((link) => (
+                <Link
+                  key={link.name}
+                  href={link.href}
+                  className={`shrink-0 px-3 py-1.5 rounded-full text-xs font-medium transition-colors duration-200 ${
+                    isActiveLink(link.href)
+                      ? 'bg-green-50 text-green-600 ring-1 ring-green-200'
+                      : 'text-gray-600 bg-gray-100 hover:bg-green-50 hover:text-green-600'
+                  }`}
+                >
+                  {link.name}
+                </Link>
+              ))}
             </div>
           </div>
 
-          {/* Mobile Menu */}
-          {isMobileMenuOpen && (
-            <div className="md:hidden border-t border-gray-200 py-4 animate-fade-in">
-              <nav className="space-y-1">
-                {navigationLinks.map((link) => (
-                  <Link
-                    key={link.name}
-                    href={link.href}
-                    onClick={() => setIsMobileMenuOpen(false)}
-                    className={`block px-4 py-3.5 rounded-lg text-sm font-medium transition-colors duration-200 ${
-                      isActiveLink(link.href)
-                        ? 'text-green-600 bg-green-50'
-                        : 'text-gray-700 hover:text-green-600 hover:bg-green-50'
-                    }`}
-                  >
-                    {link.name}
-                  </Link>
-                ))}
-              </nav>
-              
-              {/* Mobile Categories */}
-              <div className="mt-4 pt-4 border-t border-gray-200">
-                <h3 className="text-xs font-bold text-gray-500 uppercase tracking-wider mb-3 px-3">
-                  Shop by Category
-                </h3>
-                <div className="space-y-1">
-                  <Link
-                    href="/categories"
-                    onClick={() => setIsMobileMenuOpen(false)}
-                    className="block px-4 py-3.5 text-gray-700 hover:text-green-600 hover:bg-green-50 rounded-lg transition-colors duration-200"
-                  >
-                    <span className="text-sm font-medium">All Categories</span>
-                  </Link>
-                  {categories.map((category) => (
-                    <Link
-                      key={category._id}
-                      href={`/categories/${category._id}`}
-                      onClick={() => setIsMobileMenuOpen(false)}
-                      className="block px-4 py-3.5 text-gray-700 hover:text-green-600 hover:bg-green-50 rounded-lg transition-colors duration-200"
-                    >
-                      <span className="text-sm font-medium">{category.name}</span>
-                    </Link>
-                  ))}
-                </div>
-              </div>
-            </div>
-          )}
         </div>
       </div>
     </>

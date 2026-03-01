@@ -5,6 +5,7 @@ import { Provider } from "react-redux";
 import { Bounce, ToastContainer } from "react-toastify";
 import { AppStoreType, createStore, preloadedState } from "../store/store";
 import { AuthState } from "../features/auth/server/auth.action";
+import StoreInitializer from "./StoreInitializer";
 
 type ProvidersProps = {
   children: ReactNode;
@@ -22,6 +23,7 @@ export default function providers({
   return (
     <>
       <Provider store={storeRef.current}>
+        <StoreInitializer />
         {children}
         <ToastContainer
           position="top-right"

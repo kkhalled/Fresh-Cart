@@ -50,6 +50,7 @@ export default function CategorySection() {
               strokeWidth={2.5}
               stroke="currentColor"
               className="w-5 h-5 group-hover:translate-x-1 transition-transform duration-300"
+              
             >
               <path
                 strokeLinecap="round"
@@ -81,7 +82,7 @@ export default function CategorySection() {
               categories.slice(0, 10).map((category) => (
                 <Link
                   key={category._id}
-                  href={`/categories/${category.slug}`}
+                  href={`/categories/${category._id}`}
                   className="flex flex-col items-center group cursor-pointer"
                 >
                   {/* Enhanced image container */}
@@ -92,6 +93,7 @@ export default function CategorySection() {
                         src={category.image}
                         alt={category.name}
                         fill
+                        loading="lazy"
                         sizes="(max-width: 768px) 96px, 112px"
                         className="object-cover group-hover:scale-110 transition-transform duration-500 relative z-10"
                       />
