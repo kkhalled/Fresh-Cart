@@ -4,6 +4,7 @@ import "@fortawesome/fontawesome-svg-core/styles.css";
 import { Exo } from "next/font/google";
 import Providers from "./../providers/providers";
 import { verifyToken } from "../features/auth/server/auth.action";
+import { SpeedInsights } from "@vercel/speed-insights/next";
 const exo = Exo({
   subsets: ["latin"],
   weight: ["400", "500", "600", "700"],
@@ -32,6 +33,7 @@ export default async function RootLayout({
           <Providers preloadedState={{ auth: verifyTokenResult }}>
             {children}
           </Providers>
+          <SpeedInsights />
         </body>
       </html>
     </>
