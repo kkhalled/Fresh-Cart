@@ -5,6 +5,7 @@ import { getToken } from "../../auth/server/auth.action";
 import setToken from "../../auth/server/auth.action";
 import { USER_ENDPOINTS } from "@/src/config/api";
 import type {
+  ActionResult,
   BackendUpdateMeResponse,
   BackendChangePasswordResponse,
   UpdateProfileInputValues,
@@ -16,11 +17,25 @@ import type {
    Server-side API layer for account management — only Axios calls, no Redux.
    ═══════════════════════════════════════════════════════════════════════════ */
 
+/**
+ * Extract a plain, serializable message from an Axios error while still on
+ * the server side (where response.data is accessible).
+ */
+function extractErrorMessage(error: unknown, fallback: string): string {
+  if (axios.isAxiosError(error)) {
+    const data = error.response?.data as Record<string, unknown> | undefined;
+    if (typeof data?.message === "string" && data.message) return data.message;
+    if (error.message) return error.message;
+  }
+  if (error instanceof Error && error.message) return error.message;
+  return fallback;
+}
+
 /* ── Update User Profile ───────────────────────────────────────────────── */
 
 export async function updateUserProfile(
   values: UpdateProfileInputValues
-): Promise<BackendUpdateMeResponse> {
+): Promise<ActionResult<BackendUpdateMeResponse>> {
   const token = await getToken();
 
   const options: AxiosRequestConfig = {
@@ -30,15 +45,19 @@ export async function updateUserProfile(
     headers: { token },
   };
 
-  const { data } = await axios.request<BackendUpdateMeResponse>(options);
-  return data;
+  try {
+    const { data } = await axios.request<BackendUpdateMeResponse>(options);
+    return { ok: true, data };
+  } catch (error) {
+    return { ok: false, message: extractErrorMessage(error, "Failed to update profile") };
+  }
 }
 
 /* ── Change User Password ──────────────────────────────────────────────── */
 
 export async function changeUserPassword(
   values: ChangePasswordInputValues
-): Promise<BackendChangePasswordResponse> {
+): Promise<ActionResult<BackendChangePasswordResponse>> {
   const token = await getToken();
 
   const options: AxiosRequestConfig = {
@@ -48,12 +67,15 @@ export async function changeUserPassword(
     headers: { token },
   };
 
-  const { data } = await axios.request<BackendChangePasswordResponse>(options);
+  try {
+    const { data } = await axios.request<BackendChangePasswordResponse>(options);
 
-  // Update token after password change
-  if (data.token) {
-    await setToken(data.token, true);
+    if (data.token) {
+      await setToken(data.token, true);
+    }
+
+    return { ok: true, data };
+  } catch (error) {
+    return { ok: false, message: extractErrorMessage(error, "Failed to change password") };
   }
-
-  return data;
 }

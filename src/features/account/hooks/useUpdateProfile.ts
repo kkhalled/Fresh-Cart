@@ -28,7 +28,6 @@ export default function useUpdateProfile() {
     register,
     handleSubmit,
     formState: { errors, isSubmitting },
-    setError,
     reset,
   } = useForm<UpdateProfileInputValues>({
     resolver: zodResolver(UpdateProfileSchema),
@@ -40,57 +39,42 @@ export default function useUpdateProfile() {
   });
 
   const onSubmit = async (values: UpdateProfileInputValues) => {
-    try {
-      const response = await updateUserProfile(values);
+    // Don't send empty phone string to the API
+    const payload: UpdateProfileInputValues = {
+      name: values.name,
+      email: values.email,
+      ...(values.phone ? { phone: values.phone } : {}),
+    };
 
-      // Update Redux store with new user info
-      dispatch(
-        setAuthenticated({
-          isAuthenticated: true,
-          userInfo: {
-            name: response.user.name,
-            email: response.user.email,
-            role: response.user.role,
-          },
-        })
-      );
+    const result = await updateUserProfile(payload);
 
-      toast.success(response.message || "Profile updated successfully!");
-    } catch (error: any) {
-      const errorData = error?.response?.data;
-      
-      // Handle validation errors from backend
-      if (errorData?.errors) {
-        const backendError = errorData.errors;
-        
-        // Check if it's a single error object with param and msg
-        if (backendError.param && backendError.msg) {
-          const fieldName = backendError.param;
-          setError(fieldName as keyof UpdateProfileInputValues, {
-            message: backendError.msg,
-          });
-          
-          toast.error(backendError.msg);
-        } 
-        // Handle multiple errors (object with field keys)
-        else if (typeof backendError === 'object') {
-          Object.keys(backendError).forEach((key) => {
-            setError(key as keyof UpdateProfileInputValues, {
-              message: backendError[key],
-            });
-          });
-          
-          const message = errorData?.message || "Failed to update profile";
-          toast.error(message);
-        }
-      } else {
-        const message =
-          errorData?.message ||
-          error?.message ||
-          "Failed to update profile";
-        toast.error(message);
-      }
+    if (!result.ok) {
+      toast.error(result.message);
+      return;
     }
+
+    const { data } = result;
+
+    // Update Redux store with new user info
+    dispatch(
+      setAuthenticated({
+        isAuthenticated: true,
+        userInfo: {
+          name: data.user.name,
+          email: data.user.email,
+          role: data.user.role,
+        },
+      })
+    );
+
+    // Reset form with updated values so defaultValues stay in sync
+    reset({
+      name: data.user.name,
+      email: data.user.email,
+      phone: values.phone || "",
+    });
+
+    toast.success(data.message || "Profile updated successfully!");
   };
 
   return {

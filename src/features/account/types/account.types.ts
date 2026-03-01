@@ -3,6 +3,13 @@
    Type definitions for account management feature.
    ═══════════════════════════════════════════════════════════════════════════ */
 
+/* ── Generic Action Result ─────────────────────────────────────────────── */
+
+/** Discriminated union returned by every server action — never throws. */
+export type ActionResult<T> =
+  | { ok: true; data: T }
+  | { ok: false; message: string };
+
 /* ── Backend Response Types ────────────────────────────────────────────── */
 
 export interface BackendUpdateMeResponse {

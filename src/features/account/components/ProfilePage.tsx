@@ -1,8 +1,6 @@
 "use client";
 
 import { useState } from "react";
-import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
-import { faInfoCircle } from "@fortawesome/free-solid-svg-icons";
 import useUpdateProfile from "../hooks/useUpdateProfile";
 import { useUnsavedChanges } from "../hooks/useUnsavedChanges";
 
@@ -62,26 +60,33 @@ export default function ProfilePage() {
           )}
         </div>
 
-        {/* Email (Read-only) */}
+        {/* Email */}
         <div>
-          <label className="block text-sm font-medium text-neutral-700 mb-1.5">
-            Email address
+          <label
+            htmlFor="email"
+            className="block text-sm font-medium text-neutral-700 mb-1.5"
+          >
+            Email address <span className="text-red-500">*</span>
           </label>
           <input
+            id="email"
             type="email"
-            value={userInfo?.email || ""}
-            readOnly
-            className="w-full px-3 py-2 text-sm bg-neutral-50 border border-neutral-200 rounded-lg text-neutral-500 cursor-not-allowed"
+            {...register("email")}
+            onChange={(e) => {
+              register("email").onChange(e);
+              setIsDirty(true);
+            }}
+            className={`
+              w-full px-3 py-2 text-sm bg-white border rounded-lg
+              focus:outline-none focus:ring-2 focus:ring-emerald-500/20 focus:border-emerald-500
+              transition-colors
+              ${errors.email ? "border-red-400" : "border-neutral-300"}
+            `}
+            placeholder="Your email address"
           />
-          <div className="mt-1.5 flex items-start gap-1.5">
-            <FontAwesomeIcon
-              icon={faInfoCircle}
-              className="w-3 h-3 text-neutral-400 mt-0.5 shrink-0"
-            />
-            <p className="text-xs text-neutral-500">
-              Email changes require verification. Contact support to update your email.
-            </p>
-          </div>
+          {errors.email && (
+            <p className="mt-1 text-xs text-red-500">{errors.email.message}</p>
+          )}
         </div>
 
         {/* Phone */}
