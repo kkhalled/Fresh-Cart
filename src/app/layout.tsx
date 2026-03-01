@@ -1,3 +1,4 @@
+import { SpeedInsights } from "@vercel/speed-insights/next"
 import type { Metadata } from "next";
 import "../styles/globals.css";
 import "@fortawesome/fontawesome-svg-core/styles.css";
@@ -31,6 +32,7 @@ export default async function RootLayout({
         <body className={` antialiased ${exo.className} font-medium`}>
           <Providers preloadedState={{ auth: verifyTokenResult }}>
             {children}
+            <SpeedInsights />
           </Providers>
         </body>
       </html>
