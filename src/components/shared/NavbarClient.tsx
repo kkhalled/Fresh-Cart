@@ -14,6 +14,7 @@ import {
   faUserPlus,
 } from "@fortawesome/free-solid-svg-icons";
 import { faHeart, faUser } from "@fortawesome/free-regular-svg-icons";
+import SearchBar from "./SearchBar";
 import { useSelector } from "react-redux";
 import { toast } from "react-toastify";
 import { AppState } from "@/src/store/store";
@@ -34,7 +35,6 @@ interface NavbarClientProps {
 export default function NavbarClient({ topBar }: NavbarClientProps) {
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
   const [isMobileSearchOpen, setIsMobileSearchOpen] = useState(false);
-  const [searchQuery, setSearchQuery] = useState("");
   const [isAtTop, setIsAtTop] = useState(true);
 
   const isAuthenticated = useSelector(
@@ -77,11 +77,6 @@ export default function NavbarClient({ topBar }: NavbarClientProps) {
     window.addEventListener("resize", handleResize);
     return () => window.removeEventListener("resize", handleResize);
   }, []);
-
-  const handleSearch = (e: React.FormEvent) => {
-    e.preventDefault();
-    // TODO: wire up search navigation
-  };
 
   const handleLogout = useCallback(() => {
     setIsMobileMenuOpen(false);
@@ -140,27 +135,9 @@ export default function NavbarClient({ topBar }: NavbarClientProps) {
             </Link>
 
             {/* Desktop search */}
-            <form
-              onSubmit={handleSearch}
-              className="hidden lg:flex flex-1 max-w-xl mx-8"
-            >
-              <div className="relative w-full group">
-                <div className="absolute inset-y-0 left-0 pl-4 flex items-center pointer-events-none">
-                  <FontAwesomeIcon
-                    icon={faSearch}
-                    className="text-gray-400 text-sm group-focus-within:text-green-600 transition-colors"
-                  />
-                </div>
-                <input
-                  type="search"
-                  value={searchQuery}
-                  onChange={(e) => setSearchQuery(e.target.value)}
-                  placeholder="Search fresh groceries..."
-                  className="w-full pl-11 pr-4 py-2.5 text-sm border-2 border-gray-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-green-500 focus:border-green-500 transition-all bg-gray-50 focus:bg-white placeholder:text-gray-400"
-                  aria-label="Search products"
-                />
-              </div>
-            </form>
+            <div className="hidden lg:flex flex-1 max-w-xl mx-8">
+              <SearchBar />
+            </div>
 
             {/* Mobile: search + cart icons */}
             <div className="flex items-center gap-1 md:hidden">
@@ -290,28 +267,13 @@ export default function NavbarClient({ topBar }: NavbarClientProps) {
 
           {/* Mobile search bar (inline, below header) */}
           {isMobileSearchOpen && (
-            <form
-              onSubmit={handleSearch}
-              className="pb-3 lg:hidden animate-fade-in"
-            >
-              <div className="relative">
-                <div className="absolute inset-y-0 left-0 pl-3.5 flex items-center pointer-events-none">
-                  <FontAwesomeIcon
-                    icon={faSearch}
-                    className="text-gray-400 text-sm"
-                  />
-                </div>
-                <input
-                  type="search"
-                  value={searchQuery}
-                  onChange={(e) => setSearchQuery(e.target.value)}
-                  placeholder="Search products..."
-                  className="w-full pl-10 pr-4 py-2.5 text-sm border-2 border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-green-500 focus:border-green-500 bg-gray-50"
-                  autoFocus
-                  aria-label="Search products"
-                />
-              </div>
-            </form>
+            <div className="pb-3 lg:hidden">
+              <SearchBar
+                autoFocus
+                placeholder="Search products..."
+                onClose={() => setIsMobileSearchOpen(false)}
+              />
+            </div>
           )}
         </div>
       </div>

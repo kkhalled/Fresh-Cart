@@ -16,11 +16,12 @@ interface FilterSidebarProps {
   categories: ApiCategoryItem[];
   filters: FiltersState;
   onChange: (filters: FiltersState) => void;
+  bare?: boolean;
 }
 
 const ratings = [5, 4, 3, 2, 1];
 
-export default function FilterSidebar({ categories, filters, onChange }: FilterSidebarProps) {
+export default function FilterSidebar({ categories, filters, onChange, bare = false }: FilterSidebarProps) {
   const toggleCategory = (id: string) => {
     const updated = filters.categories.includes(id)
       ? filters.categories.filter((c) => c !== id)
@@ -44,7 +45,7 @@ export default function FilterSidebar({ categories, filters, onChange }: FilterS
     filters.inStockOnly;
 
   return (
-    <aside className="bg-white rounded-xl border border-gray-200 p-6 space-y-6 shadow-sm h-fit">
+    <aside className={bare ? "space-y-6" : "bg-white rounded-xl border border-gray-200 p-6 space-y-6 shadow-sm h-fit"}>
       {/* Categories */}
       <div>
         <h3 className="text-sm font-semibold text-gray-900 mb-3 uppercase tracking-wide">

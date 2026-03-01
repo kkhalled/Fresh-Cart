@@ -38,7 +38,7 @@ export default function PopularProductsSection({ products }: PopularProductsSect
           <h2 className="text-xl md:text-2xl font-bold text-gray-900 mb-1">Popular Products</h2>
           <p className="text-xs text-gray-500">Top rated products loved by customers</p>
         </div>
-        <div className="flex items-center gap-3">
+        <div className="hidden sm:flex items-center gap-3">
           <div className="flex items-center gap-1">
             <button className="popular-prev w-8 h-8 flex items-center justify-center rounded-full border border-gray-200 text-gray-600 hover:border-green-500 hover:text-green-600 transition-colors" aria-label="Previous">
               <FontAwesomeIcon icon={faChevronLeft} className="w-3 h-3" />

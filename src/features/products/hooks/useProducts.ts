@@ -1,4 +1,5 @@
 import { useEffect, useState, useMemo, useCallback } from "react";
+import { useSearchParams } from "next/navigation";
 import { Product } from "../types/products.types";
 import { getProducts } from "../server/products.action";
 import getAllCategories from "@/src/features/categories/server/category.action";
@@ -72,7 +73,21 @@ function applyFilters(
   });
 }
 
+function applyTextSearch(products: Product[], q: string): Product[] {
+  if (!q.trim()) return products;
+  const lower = q.toLowerCase();
+  return products.filter(
+    (p) =>
+      p.title.toLowerCase().includes(lower) ||
+      p.brand?.name?.toLowerCase().includes(lower) ||
+      p.category?.name?.toLowerCase().includes(lower) ||
+      p.description?.toLowerCase().includes(lower)
+  );
+}
+
 export function useProducts() {
+  const searchParams = useSearchParams();
+  const urlQuery = searchParams.get("q") ?? "";
   const [products, setProducts] = useState<Product[]>([]);
   const [categories, setCategories] = useState<ApiCategoryItem[]>([]);
   const [loading, setLoading] = useState(true);
@@ -109,11 +124,21 @@ export function useProducts() {
     fetchData();
   }, []);
 
+  // Reset page when URL search query changes
+  useEffect(() => {
+    setPage(1);
+  }, [urlQuery]);
+
   const sorted = useMemo(() => sortProducts(products, sort), [products, sort]);
 
+  const textFiltered = useMemo(
+    () => applyTextSearch(sorted, urlQuery),
+    [sorted, urlQuery]
+  );
+
   const filtered = useMemo(
-    () => applyFilters(sorted, filters, activePillId),
-    [sorted, filters, activePillId]
+    () => applyFilters(textFiltered, filters, activePillId),
+    [textFiltered, filters, activePillId]
   );
 
   const totalPages = Math.ceil(filtered.length / PAGE_SIZE);
@@ -153,6 +178,7 @@ export function useProducts() {
     page,
     totalPages,
     totalFiltered: filtered.length,
+    urlQuery,
     setPage,
     handleSort,
     handleFiltersChange,
