@@ -43,7 +43,7 @@ export const fetchCart = createAsyncThunk<
 
     return {
       cartId: response.data._id,
-      items,
+      items : response.data.products ? items : [], // Handle empty cart case
       total: response.data.totalCartPrice,
       numOfCartItems: response.numOfCartItems,
     };
