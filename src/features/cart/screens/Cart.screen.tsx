@@ -43,6 +43,7 @@ export default function CartScreen() {
     total,
     numOfCartItems,
     loading,
+    initialized,
     pendingActions,
     updateQuantity,
     removeItem,
@@ -87,8 +88,8 @@ export default function CartScreen() {
   const finalTotal = taxable + tax + shipping;
   const itemCount = items.reduce((acc, item) => acc + item.quantity, 0);
 
-  /* ── Loading state — skeleton ──────────────────────────────────────── */
-  if (loading && items.length === 0) {
+  /* ── Loading/boot state — skeleton ─────────────────────────────────── */
+  if ((!initialized || loading) && items.length === 0) {
     return <CartSkeleton />;
   }
 

@@ -8,21 +8,19 @@ import {
   clearCart,
   resetCartInitialized,
 } from "@/src/features/cart/store/cart.slice";
-import {
-  fetchCart,
-  mergeGuestCartThunk,
-} from "@/src/features/cart/store/cart.thunks";
+import { fetchCart } from "@/src/features/cart/store/cart.thunks";
 import { fetchWishlist } from "@/src/features/wishlist/store/wishlist.thunks";
 import { getGuestCart } from "@/src/features/cart/utils/guestCart.storage";
 import { mapGuestCartToItems } from "@/src/features/cart/utils/cart.mapper";
 import type { GuestCartItem } from "@/src/features/cart/types/cart.types";
-import { toast } from "react-toastify";
 
 /* ═══════════════════════════════════════════════════════════════════════════
    StoreInitializer
    Runs ONCE at the provider level to initialize cart & wishlist state.
-   Prevents every ProductCard from independently triggering init logic
-   and dispatching redundant API calls.
+   
+   Cart merge (guest→auth) is handled by the signin hook directly.
+   This component only fetches the server cart on page refresh and
+   handles guest-mode initialization from localStorage.
    ═══════════════════════════════════════════════════════════════════════════ */
 
 function computeGuestTotal(guestItems: GuestCartItem[]) {
@@ -48,10 +46,14 @@ export default function StoreInitializer() {
       prevAuthRef.current !== null &&
       prevAuthRef.current !== isAuthenticated
     ) {
-      dispatch(resetCartInitialized());
       if (!isAuthenticated) {
+        // auth → guest (logout): clear server cart state, reset so guest
+        // cart can be loaded from localStorage on next init cycle.
+        dispatch(resetCartInitialized());
         dispatch(clearCart());
       }
+      // guest → auth: the signin handler already merged the guest cart
+      // and populated the Redux state. No reset needed here.
     }
 
     prevAuthRef.current = isAuthenticated;
@@ -62,29 +64,11 @@ export default function StoreInitializer() {
     if (cartInitialized || cartLoading) return;
 
     if (isAuthenticated) {
-      const guestItems = getGuestCart();
-
-      if (guestItems.length > 0) {
-        dispatch(
-          mergeGuestCartThunk(
-            guestItems.map((g) => ({
-              productId: g.productId,
-              quantity: g.quantity,
-            })),
-          ),
-        )
-          .unwrap()
-          .then(() => {
-            toast.success("Your saved items have been added to your cart!");
-          })
-          .catch(() => {
-            toast.error("Failed to merge your saved items.");
-            dispatch(fetchCart());
-          });
-      } else {
-        dispatch(fetchCart());
-      }
+      // On page refresh / initial load, just fetch the server cart.
+      // The signin flow already handled any guest → auth merge.
+      dispatch(fetchCart());
     } else {
+      // Guest mode — hydrate Redux from localStorage
       const guestItems = getGuestCart();
       const { items: mapped, total: guestTotal } =
         computeGuestTotal(guestItems);
@@ -106,3 +90,4 @@ export default function StoreInitializer() {
 
   return null;
 }
+

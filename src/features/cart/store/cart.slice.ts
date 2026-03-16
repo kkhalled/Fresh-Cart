@@ -5,7 +5,6 @@ import {
   addToCartThunk,
   removeFromCartThunk,
   updateQuantityThunk,
-  mergeGuestCartThunk,
   clearCartThunk,
 } from "./cart.thunks";
 
@@ -133,24 +132,6 @@ const cartSlice = createSlice({
         state.error = action.payload ?? "Unknown error";
       });
 
-    /* ── mergeGuestCart ────────────────────────────────────────────────── */
-    builder
-      .addCase(mergeGuestCartThunk.pending, (state) => {
-        state.loading = true;
-        state.error = null;
-      })
-      .addCase(mergeGuestCartThunk.fulfilled, (state, action) => {
-        state.loading = false;
-        state.cartId = action.payload.cartId;
-        state.items = action.payload.items;
-        state.total = action.payload.total;
-        state.numOfCartItems = action.payload.numOfCartItems;
-        state.initialized = true;
-      })
-      .addCase(mergeGuestCartThunk.rejected, (state, action) => {
-        state.loading = false;
-        state.error = action.payload ?? "Unknown error";
-      });
     /* ── clearCart ─────────────────────────────────────────────────────── */
     builder
       .addCase(clearCartThunk.pending, (state) => {

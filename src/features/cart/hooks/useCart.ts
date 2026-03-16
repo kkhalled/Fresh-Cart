@@ -1,26 +1,22 @@
 "use client";
 
-import { useCallback, useEffect, useRef } from "react";
+import { useCallback } from "react";
 import { toast } from "react-toastify";
 import type { GuestCartItem, CartState } from "../types/cart.types";
 import { useAppDispatch, useAppSelector } from "@/src/store/store";
 import {
-  setCartMode,
   setGuestCartItems,
   clearCart,
-  resetCartInitialized,
 } from "../store/cart.slice";
 import {
-  fetchCart,
   addToCartThunk,
   removeFromCartThunk,
   updateQuantityThunk,
-  mergeGuestCartThunk,
   clearCartThunk,
 } from "../store/cart.thunks";
 import {
-  getGuestCart,
   addGuestCartItem,
+  clearGuestCart,
   removeGuestCartItem,
   updateGuestCartItemQuantity,
 } from "../utils/guestCart.storage";
@@ -61,59 +57,9 @@ export function useCart() {
     pendingActions,
   } = cart;
 
-  /* ── Track auth transitions ─────────────────────────────────────────── */
-  const prevAuthRef = useRef<boolean | null>(null);
-
-  useEffect(() => {
-    dispatch(setCartMode(isAuthenticated ? "auth" : "guest"));
-
-    // Detect auth-state transition (login / logout)
-    if (prevAuthRef.current !== null && prevAuthRef.current !== isAuthenticated) {
-      dispatch(resetCartInitialized());
-
-      if (!isAuthenticated) {
-        dispatch(clearCart());
-      }
-    }
-    
-    prevAuthRef.current = isAuthenticated;
-  }, [isAuthenticated, dispatch]);
-
-  /* ── Initialize cart (runs once until initialized flag is set) ───────── */
-  useEffect(() => {
-    if (initialized || loading) return;
-
-    if (isAuthenticated) {
-      const guestItems = getGuestCart();
-
-      if (guestItems.length > 0) {
-        dispatch(
-          mergeGuestCartThunk(
-            guestItems.map((g) => ({
-              productId: g.productId,
-              quantity: g.quantity,
-            })),
-          ),
-        )
-          .unwrap()
-          .then(() => {
-            toast.success("Your saved items have been added to your cart!");
-          })
-          .catch(() => {
-            toast.error("Failed to merge your saved items.");
-            dispatch(fetchCart());
-          });
-      } else {
-        dispatch(fetchCart());
-      }
-    } else {
-      const guestItems = getGuestCart();
-      const { items: mapped, total: guestTotal } =
-        computeGuestTotal(guestItems);
-      dispatch(setGuestCartItems({ items: mapped, total: guestTotal }));
-    }
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [initialized, loading, isAuthenticated, dispatch]);
+  // Cart initialization + guest→auth merge is handled centrally by
+  // `src/providers/StoreInitializer.tsx` to avoid race conditions and
+  // duplicated network calls across components.
 
   /* ── Add item ───────────────────────────────────────────────────────── */
   const addItem = useCallback(
@@ -194,9 +140,7 @@ export function useCart() {
         .catch(() => toast.error("Failed to clear cart"));
     } else {
       dispatch(clearCart());
-      if (typeof window !== "undefined") {
-        localStorage.removeItem("guestCart");
-      }
+      clearGuestCart();
       toast.success("Cart cleared");
     }
   }, [isAuthenticated, dispatch]);
@@ -207,6 +151,7 @@ export function useCart() {
     numOfCartItems,
     loading,
     error,
+    initialized,
     mode,
     pendingActions,
     addItem,

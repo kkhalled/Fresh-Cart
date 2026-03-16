@@ -4,11 +4,9 @@ import {
   getCart,
   removeFromCart,
   updateQuantity,
-  mergeGuestCart,
   clearCartServer,
 } from "../server/cart.server";
 import { mapBackendCartToItems } from "../utils/cart.mapper";
-import { clearGuestCart } from "../utils/guestCart.storage";
 import type { CartItem } from "../types/cart.types";
 
 /* ═══════════════════════════════════════════════════════════════════════════
@@ -145,33 +143,3 @@ export const clearCartThunk = createAsyncThunk<
   }
 });
 
-/* ─── Merge Guest Cart after Login ─────────────────────────────────────── */
-
-export const mergeGuestCartThunk = createAsyncThunk<
-  CartPayload,
-  { productId: string; quantity: number }[],
-  { rejectValue: string }
->("cart/mergeGuestCart", async (guestItems, { rejectWithValue }) => {
-  try {
-    // Server-side: adds each product & sets quantity.
-    await mergeGuestCart(guestItems);
-
-    // Wipe localStorage.
-    clearGuestCart();
-
-    // Refetch the unified cart with populated product data.
-    const response = await getCart();
-    const items = mapBackendCartToItems(response.data);
-
-    return {
-      cartId: response.data._id,
-      items,
-      total: response.data.totalCartPrice,
-      numOfCartItems: response.numOfCartItems,
-    };
-  } catch (error: unknown) {
-    const message =
-      error instanceof Error ? error.message : "Failed to merge cart";
-    return rejectWithValue(message);
-  }
-});

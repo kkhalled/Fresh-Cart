@@ -97,16 +97,3 @@ export async function clearCartServer(): Promise<void> {
   await axios.request(options);
 }
 
-/* ─── Merge Guest Cart into Authenticated Cart ─────────────────────────── */
-
-export async function mergeGuestCart(
-  items: { productId: string; quantity: number }[],
-): Promise<void> {
-  for (const item of items) {
-    await addToCart(item.productId);
-
-    if (item.quantity > 1) {
-      await updateQuantity(item.productId, item.quantity);
-    }
-  }
-}
